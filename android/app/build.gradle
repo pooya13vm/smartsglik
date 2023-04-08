@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+// apply plugin: "com.google.gms.google-services"
 
 import com.android.build.OutputFile
 
@@ -276,9 +277,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-
+    implementation platform('com.google.firebase:firebase-bom:31.2.3') //added by pooya
+    implementation 'com.google.firebase:firebase-analytics-ktx' //added by pooya
+    // implementation project(path: ":@react-native-firebase_app") //added by pooya
     //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.react:react-native:0.70.5"  // From node_modules
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

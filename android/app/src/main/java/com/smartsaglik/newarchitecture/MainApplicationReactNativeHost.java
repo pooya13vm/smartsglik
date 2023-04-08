@@ -36,7 +36,7 @@ import java.util.List;
 public class MainApplicationReactNativeHost extends ReactNativeHost {
   public MainApplicationReactNativeHost(Application application) {
     super(application);
-  }
+  };
 
   @Override
   public boolean getUseDeveloperSupport() {

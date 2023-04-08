@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "39560378684",
+    "project_id": "smart-saglik",
+    "storage_bucket": "smart-saglik.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:39560378684:android:3975029e9f3be3de4f4639",
+        "android_client_info": {
+          "package_name": "com.smartsaglik"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "39560378684-gsola3suh523pa99f4026gkkhbvl40o6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smartsaglik",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "39560378684-3fum3230hc238koma5o15getc915tmj4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8MuXztdv0C6CFBlSsSb4WF3WVA4U7cc8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "39560378684-3fum3230hc238koma5o15getc915tmj4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

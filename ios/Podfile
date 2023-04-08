@@ -5,13 +5,21 @@ require File.join(File.dirname(`node --print "require.resolve('@react-native-com
 require 'json'
 podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties.json'))) rescue {}
 
+
 platform :ios, podfile_properties['ios.deploymentTarget'] || '13.0'
 install! 'cocoapods',
   :deterministic_uuids => false
 
+
 target 'smartSaglik' do
   use_expo_modules!
   config = use_native_modules!
+
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
+
+  #added by pooya
+  # pod 'RNFBDatabase', :path => '../node_modules/@react-native-firebase/database'
 
   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
 
@@ -29,6 +37,17 @@ target 'smartSaglik' do
     # Note that if you have use_frameworks! enabled, Flipper will not work
     # :flipper_configuration => !ENV['CI'] ? FlipperConfiguration.enabled : FlipperConfiguration.disabled,
   )
+  pre_install do |installer|
+    Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+  
+    installer.pod_targets.each do |pod|
+      if pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
+        def pod.build_type;
+          Pod::BuildType.static_library
+        end
+      end
+    end
+  end
 
   post_install do |installer|
     react_native_post_install(

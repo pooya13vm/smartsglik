@@ -19,6 +19,8 @@ import expo.modules.ReactNativeHostWrapper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+// added by pooya
+import io.invertase.firebase.app.ReactNativeFirebaseAppPackage;
 
 public class MainApplication extends Application implements ReactApplication {
   private final ReactNativeHost mReactNativeHost = new ReactNativeHostWrapper(
@@ -32,9 +34,11 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       @SuppressWarnings("UnnecessaryLocalVariable")
-      List<ReactPackage> packages = new PackageList(this).getPackages();
-      // Packages that cannot be autolinked yet can be added manually here, for example:
-      // packages.add(new MyReactNativePackage());
+      List<ReactPackage> packages = new PackageList(this).getPackages(
+        // new ReactNativeFirebaseAppPackage()
+      );
+      // added by pooya
+      // packages.add(new ReactNativeFirebaseAppPackage());
       return packages;
     }
 
