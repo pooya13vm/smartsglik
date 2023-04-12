@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { colors } from "../assets/utility/colors";
 import { BlockContainer, PanelContentContainer, BlockTitle } from "../styles";
@@ -47,15 +47,13 @@ const DoppConnect = ({ message }) => {
   const [isFinishedRec, setIsFinishedRec] = useState(false);
   const [svgHeight, setSVGHeight] = useState(0);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [soundObject, setSoundObject] = useState();
+  const [soundObject, setSoundObject] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
-  const [sliderValue, setSliderValue] = useState(0);
-  const [playBackObj, setPlayBackObj] = useState();
+  const [sliderValue, setSliderValue] = useState(Number);
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [heartBeat, setHeartBeat] = useState([]);
 
   const { saveSoundToStorage } = useContext(AppContext);
-  let sliderInterval = useRef(null);
 
   function formatTime(milliseconds) {
     let totalSeconds = Math.floor(milliseconds / 1000);
@@ -105,14 +103,14 @@ const DoppConnect = ({ message }) => {
     try {
       console.log("in stop recording");
       await recording.stopAndUnloadAsync();
-      const { sound, status } = await recording.createNewLoadedSoundAsync();
+      const { sound } = await recording.createNewLoadedSoundAsync();
 
       const average =
         heartBeat.length > 0
           ? heartBeat.reduce((a, b) => a + b, 0) / heartBeat.length
           : 0;
       let mySoundObj = {
-        // sound: sound,
+        sound: sound,
         id: uuid.v4(),
         beatArray: heartBeat,
         date: new Date(),
@@ -130,58 +128,40 @@ const DoppConnect = ({ message }) => {
   }
   // ----------------------- start playing sound ---------------------->
   async function playSound() {
-    if (!isPlaying) {
-      const playBack = new Audio.Sound();
-      const playStatus = await playBack.loadAsync(
-        { uri: soundObject.uri },
-        { shouldPlay: true }
-      );
-      setIsPlaying(true);
-      setPlayBackObj(playBack);
-      sliderCounter();
-      console.log("2", soundObject.position);
-    }
+    setIsPlaying(true);
+    await soundObject.sound.playAsync();
+    const status = await soundObject.sound.getStatusAsync();
+    soundObject.sound.setOnPlaybackStatusUpdate((status) => {
+      console.log("my in status :", status.positionMillis);
+      setSliderValue(status.positionMillis);
+      if (status.didJustFinish) {
+        setIsPlaying(false);
+        setSliderValue(0);
+      }
+    });
   }
   // ----------------------- stop playing sound ---------------------->
   const stopPlaySound = async () => {
-    console.log("in stop playing sound ....");
-    try {
-      clearInterval(sliderInterval);
-    } catch (error) {
-      console.log("can not stop interval", error);
-    }
     if (isPlaying) {
-      const status = await playBackObj.setStatusAsync({ shouldPlay: false });
+      await soundObject.sound.stopAsync();
       setIsPlaying(false);
     }
   };
-  // ----------------------- handlers ---------------------->
-  const sliderCounter = () => {
-    if (sliderInterval.current) clearInterval(sliderInterval.current);
-    sliderInterval.current = setInterval(() => {
-      console.log("interval is working ...");
-      if (sliderValue < recordingTime) {
-        console.log("it is in if now .....");
-        setSliderValue((per) => per + 1000);
-      } else {
-        console.log("it is in else now .....");
-        clearInterval(sliderInterval);
-        stopPlaySound();
-      }
-    }, 1000);
-    return sliderInterval;
-  };
-
+  // -----------------------save handlers ---------------------->
   const saveHandler = () => {
     saveSoundToStorage(soundObject);
     setIsVisibleModal(false);
     setIsFinishedRec(true);
-    saveSoundToStorage();
+    setHeartBeat([]);
   };
   const noSaveHandler = () => {
     setIsVisibleModal(false);
+    setHeartBeat([]);
+    setRecordingTime(0);
+    setSoundObject({});
+    setSliderValue(0);
   };
-  console.log();
+
   useEffect(() => {
     return () => {
       if (recording) {
@@ -189,15 +169,6 @@ const DoppConnect = ({ message }) => {
       }
     };
   }, []);
-  console.log("slider :", sliderValue);
-  console.log("recording time: ", recordingTime);
-  // useEffect(() => {
-  //   if (sliderValue.current > recordingTime) {
-  //     clearInterval(sliderInterval);
-  //   }
-  //   return () => clearInterval(sliderInterval);
-  // }, [sliderValue.current]);
-
   useEffect(() => {
     if (recording) {
       const interval = setInterval(() => {
@@ -355,13 +326,10 @@ const DoppConnect = ({ message }) => {
               }}
               step={1}
               thumbTintColor={colors.text}
-              // value={soundObject.position}
-              value={sliderValue / 1000}
+              value={sliderValue}
               minimumValue={0}
-              maximumValue={recordingTime / 1000}
+              maximumValue={recordingTime}
               disabled={true}
-              // onValueChange={(value) => setSliderValue(value)}
-              // onSlidingComplete={stopPlaySound}
             />
           </>
         )}

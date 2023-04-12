@@ -63,10 +63,10 @@ export const BlockTitle = styled.View`
   justify-content: space-between;
   margin: 20px 20px 0 20px;
 `;
-export const HistoryScreensContainer = styled.View`
+export const MainScreensContainer = styled.View`
   height: ${Math.floor(height - 160)}px;
-  margin-horizontal: 20px;
   position: relative;
+  justify-content: center;
 `;
 export const ChartContainer = styled.View`
   flex-direction: row;

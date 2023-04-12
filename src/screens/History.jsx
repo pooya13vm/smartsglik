@@ -1,9 +1,9 @@
 import { useState, useContext } from "react";
-import { View, useWindowDimensions } from "react-native";
+import { useWindowDimensions } from "react-native";
 import ScreenLayout from "../components/ScreenLayout";
 import { AppContext } from "../context/mainContext";
 import { Header } from "../components/Header";
-import { HistoryScreensContainer } from "../styles";
+import { MainScreensContainer } from "../styles";
 import ChooseDeviceModal from "../components/ChooseDeviceModal";
 import HistoryEKG from "../historyComponents/HistoryEKG";
 import HistoryVA from "../historyComponents/HistoryVA";
@@ -20,12 +20,12 @@ const History = ({ navigation }) => {
         <Header setShowDevicesModal={setShowDevicesModal} isPanel={false} />
       }
     >
-      <HistoryScreensContainer>
+      <MainScreensContainer>
         {device === "Fetal Doppler" && <HistoryFetal navigation={navigation} />}
         {device === "Oksimetre" && <HistoryOxim />}
         {device === "EKG" && <HistoryEKG />}
         {device === "Vücut Analizi" && <HistoryVA />}
-      </HistoryScreensContainer>
+      </MainScreensContainer>
       <ChooseDeviceModal
         isModalVisible={showDevicesModal}
         setDevice={setDevice}

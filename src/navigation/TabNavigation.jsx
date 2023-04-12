@@ -4,7 +4,6 @@ import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
 const Tab = createBottomTabNavigator();
 
 import SettingNavigation from "./SettingNavigation";
-import HistoryNavigation from "./HistoryNavigation";
 import Panel from "../screens/Panel";
 import History from "../screens/History";
 import { colors } from "../assets/utility/colors";
@@ -25,8 +24,8 @@ function TabsNavigation() {
       })}
     >
       <Tab.Screen
-        name="HistoryNavigation"
-        component={HistoryNavigation}
+        name="History"
+        component={History}
         options={{
           tabBarActiveTintColor: colors.text,
           tabBarInactiveTintColor: colors.midBlue,

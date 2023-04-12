@@ -32,7 +32,7 @@ export const AppProvider = ({ children }) => {
       const getST = await AsyncStorage.getItem("@Sound");
       const parsST = JSON.parse(getST);
       console.log("sound :", parsST);
-      if (parsST?.id) {
+      if (parsST.length > 0) {
         setDopDataArray(parsST);
       }
     } catch (error) {
@@ -78,14 +78,16 @@ export const AppProvider = ({ children }) => {
       user,
       isRegistered,
       device,
+      dopDataArray,
       saveDeviceToStorage,
       saveSoundToStorage,
       setRegister,
       setDevice,
       saveUserToStorage,
       checkStorage,
+      setDopDataArray,
     }),
-    [isRegistered, device, , user]
+    [isRegistered, device, , user, dopDataArray]
   );
   return <AppContext.Provider value={ctx}>{children}</AppContext.Provider>;
 };

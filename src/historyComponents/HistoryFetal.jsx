@@ -1,11 +1,14 @@
-import { useState } from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { colors } from "../assets/utility/colors";
-import { BlockContainer, ChartContainer } from "../styles";
+import { useState, useContext, useEffect } from "react";
+import {
+  BlockContainer,
+  ChartContainer,
+  PanelContentContainer,
+} from "../styles";
 import styled from "styled-components";
 import { XAxis, YAxis, LineChart, Grid } from "react-native-svg-charts";
-import { HistoryItem } from "../screens/HistoryItem";
+import { AppContext } from "../context/mainContext";
+import HistoryFetalList from "../components/HistoryFetalList";
+import HistoryFetalItem from "../components/HistoryFetalItem";
 
 export const AxisXLine = styled.View`
   height: 1px;
@@ -24,13 +27,20 @@ export const AxisYLine = styled.View`
   background-color: lightgrey;
 `;
 
-export const HistoryFetal = ({ navigation }) => {
+export const HistoryFetal = () => {
+  // states
+  const [selectedItem, setSelectedItem] = useState(null);
   const [componentWidth, setComponentWidth] = useState(0);
+  // context
+  const { dopDataArray } = useContext(AppContext);
+  console.log(dopDataArray[0].average);
+  // const data2 = [];
+  // useEffect(() => {
+  //   dopDataArray.map((item) => {
+  //     data2.push(item.average);
+  //   });
+  // }, []);
   const data2 = [80, 10, 95, 48, 24, 67, 51, 12, 65, 150, 24, 20, 50];
-  const data = [
-    { id: 1, date: "12 mayis 2022", average: 95, durationMill: 8756 },
-    { id: 2, date: "14 mayis 2022", average: 92, durationMill: 8576 },
-  ];
 
   const createAverageValuesArray = (data) => {
     const averageValue = data.reduce((a, b) => a + b) / data.length;
@@ -53,21 +63,16 @@ export const HistoryFetal = ({ navigation }) => {
     data2,
     averageValuesArray
   );
-  function formatTime(milliseconds) {
-    let totalSeconds = Math.floor(milliseconds / 1000);
-    let minutes = Math.floor(totalSeconds / 60);
-    let seconds = totalSeconds % 60;
-    return `${minutes} : ${seconds}`;
-  }
+
   return (
-    <View style={{ marginTop: 30 }}>
+    <PanelContentContainer>
       <BlockContainer>
         <ChartContainer>
           <YAxis
             data={data2}
             contentInset={{ top: 20, bottom: 20 }}
-            min={50}
-            max={150}
+            min={70}
+            max={200}
             svg={{
               fill: "grey",
               fontSize: 11,
@@ -103,84 +108,18 @@ export const HistoryFetal = ({ navigation }) => {
           />
         </ChartContainer>
       </BlockContainer>
-      <FlatList
-        style={{ marginTop: 20 }}
-        data={data}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingHorizontal: 20,
-              backgroundColor: colors.white,
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 4,
-              },
-              shadowOpacity: 0.3,
-              shadowRadius: 4.65,
-              elevation: 8,
-              width: "96%",
-              alignSelf: "center",
-              height: 70,
-              borderRadius: 20,
-              marginVertical: 12,
-              alignItems: "center",
-            }}
-            onPress={() => navigation.navigate(HistoryItem, { id: item.id })}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <FontAwesome5 name="calendar-alt" size={32} color={colors.text} />
-              <View style={{ marginLeft: 5 }}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: colors.text,
-                    fontWeight: "500",
-                  }}
-                >
-                  {item.date}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: colors.text,
-                    fontWeight: "500",
-                  }}
-                >
-                  {formatTime(item.durationMill)}
-                </Text>
-              </View>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <FontAwesome5 name="heart" size={34} color="#F73059" />
-              <View style={{ marginLeft: 8 }}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: colors.text,
-                    fontWeight: "500",
-                  }}
-                >
-                  Nabiz
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    color: colors.text,
-                    fontWeight: "500",
-                  }}
-                >
-                  {item.average} <Text style={{ fontSize: 12 }}>BPS</Text>
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+      {!selectedItem ? (
+        <HistoryFetalList
+          dopDataArray={dopDataArray}
+          setSelectedItem={setSelectedItem}
+        />
+      ) : (
+        <HistoryFetalItem
+          setSelectedItem={setSelectedItem}
+          selectedItem={selectedItem}
+        />
+      )}
+    </PanelContentContainer>
   );
 };
 export default HistoryFetal;

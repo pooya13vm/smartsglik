@@ -18,7 +18,13 @@ const ModalOutlineButtonText = styled.Text`
   font-weight: 500;
 `;
 
-export const WarningModal = ({ visibility, setVisibility, message }) => {
+export const WarningModal = ({
+  visibility,
+  setVisibility,
+  message,
+  result,
+  resultFunction,
+}) => {
   return (
     <ModalContainer
       heightPercentage={50}
@@ -38,9 +44,24 @@ export const WarningModal = ({ visibility, setVisibility, message }) => {
           color={colors.text}
         />
         <TitleText children={message} size={22} />
-        <ModalOutlineButton onPress={() => setVisibility(false)}>
-          <ModalOutlineButtonText>Tamam</ModalOutlineButtonText>
-        </ModalOutlineButton>
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "space-around",
+          }}
+        >
+          <ModalOutlineButton onPress={() => setVisibility(false)}>
+            <ModalOutlineButtonText>
+              {result ? "Hayır" : "Tamam"}
+            </ModalOutlineButtonText>
+          </ModalOutlineButton>
+          {result && (
+            <ModalOutlineButton onPress={resultFunction}>
+              <ModalOutlineButtonText>Evet</ModalOutlineButtonText>
+            </ModalOutlineButton>
+          )}
+        </View>
       </View>
     </ModalContainer>
   );

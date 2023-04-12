@@ -33,6 +33,7 @@ import { SubmitBtn } from "../components/SubmitBtn";
 import { TitleText } from "../components/TitleText";
 import { colors } from "../assets/utility/colors";
 import { macAddressChecker } from "../assets/utility/macAddress";
+import { MainScreensContainer } from "../styles";
 
 const SEND_SERVICE_UUID = "0000FFE5-0000-1000-8000-00805F9B34FB";
 const BOX_UUID = "0000FFE9-0000-1000-8000-00805F9B34FB";
@@ -181,13 +182,7 @@ const Panel = (props) => {
         />
       }
     >
-      <View
-        style={{
-          height: height - 160,
-          justifyContent: "center",
-          position: "relative",
-        }}
-      >
+      <MainScreensContainer>
         {!isConnected && device === "Fetal Doppler" && <DoppDisconnect />}
         {isConnected && device === "Fetal Doppler" && (
           <DoppConnect message={message} />
@@ -198,7 +193,7 @@ const Panel = (props) => {
         {isConnected && device === "EKG" && <EKGConnect />}
         {!isConnected && device === "Vücut Analizi" && <VADisconnect />}
         {isConnected && device === "Vücut Analizi" && <VAConnect />}
-      </View>
+      </MainScreensContainer>
 
       <ChooseDeviceModal
         isModalVisible={showDevicesModal}
