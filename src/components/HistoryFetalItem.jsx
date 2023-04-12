@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from "react";
-import { View, TouchableOpacity, Text } from "react-native";
 import { BlockContainer } from "../styles";
-import { FontAwesome5, AntDesign } from "@expo/vector-icons";
+import { FontAwesome5, AntDesign, Fontisto } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { colors } from "../assets/utility/colors";
 import styled from "styled-components";
@@ -97,7 +96,6 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
   // ----------------------- delete sound ---------------------->
   async function deleteSoundFile() {
     try {
-      // Delete the sound file using the Expo FileSystem API
       await FileSystem.deleteAsync(item.uri);
       console.log(`Sound file at ${item.uri} was deleted successfully`);
       const filtered = dopDataArray.filter((item) => item.id !== selectedItem);
@@ -124,21 +122,13 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
     }
     loadSound();
   }, []);
-  //   console.log(item.uri);
   return (
     <>
       <BlockContainer>
         <InsideContainer>
-          <Row>
-            <TitleText>{item.date.slice(0, 10)}</TitleText>
-            <TitleText>{`       ${item.date.slice(11, 16)}`}</TitleText>
-          </Row>
           <IconContainer>
             <AntDesignContainer onPress={() => setSelectedItem(null)}>
               <AntDesign name="back" size={24} color={colors.text} />
-            </AntDesignContainer>
-            <AntDesignContainer>
-              <AntDesign name="linechart" size={24} color={colors.text} />
             </AntDesignContainer>
             <FontAwesomeContainer onPress={shareRecording}>
               <FontAwesome5 name="share-alt" size={24} color={colors.text} />
@@ -146,8 +136,7 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
             <FontAwesomeContainer onPress={() => SetWarningModalV(true)}>
               <FontAwesome5 name="trash-alt" size={24} color={colors.text} />
             </FontAwesomeContainer>
-          </IconContainer>
-          <PlayControlContainer>
+
             <FontAwesomeContainer
               onPress={!isPlaying ? playSound : stopPlaySound}
             >
@@ -157,7 +146,16 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
                 color={colors.text}
               />
             </FontAwesomeContainer>
-          </PlayControlContainer>
+          </IconContainer>
+          <Row>
+            <TitleText>{`Min : 87     `}</TitleText>
+            <Fontisto name="heartbeat-alt" size={33} color={colors.text} />
+            <TitleText>{`     Maks : 95`}</TitleText>
+          </Row>
+          <Row>
+            <TitleText>{item.date.slice(0, 10)}</TitleText>
+            <TitleText>{`       ${item.date.slice(11, 16)}`}</TitleText>
+          </Row>
           <Slider
             style={{
               height: 50,

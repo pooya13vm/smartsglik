@@ -4,28 +4,14 @@ import {
   ChartContainer,
   PanelContentContainer,
 } from "../styles";
-import styled from "styled-components";
+import { View } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { XAxis, YAxis, LineChart, Grid } from "react-native-svg-charts";
 import { AppContext } from "../context/mainContext";
 import HistoryFetalList from "../components/HistoryFetalList";
 import HistoryFetalItem from "../components/HistoryFetalItem";
-
-export const AxisXLine = styled.View`
-  height: 1px;
-  width: 300px;
-  position: absolute;
-  left: 0;
-  bottom: 22px;
-  background-color: lightgrey;
-`;
-export const AxisYLine = styled.View`
-  height: 243px;
-  width: 1px;
-  position: absolute;
-  left: 42px;
-  bottom: 32px;
-  background-color: lightgrey;
-`;
+import { colors } from "../assets/utility/colors";
+import * as shape from "d3-shape";
 
 export const HistoryFetal = () => {
   // states
@@ -33,36 +19,14 @@ export const HistoryFetal = () => {
   const [componentWidth, setComponentWidth] = useState(0);
   // context
   const { dopDataArray } = useContext(AppContext);
-  console.log(dopDataArray[0].average);
+
   // const data2 = [];
   // useEffect(() => {
   //   dopDataArray.map((item) => {
   //     data2.push(item.average);
   //   });
   // }, []);
-  const data2 = [80, 10, 95, 48, 24, 67, 51, 12, 65, 150, 24, 20, 50];
-
-  const createAverageValuesArray = (data) => {
-    const averageValue = data.reduce((a, b) => a + b) / data.length;
-    return Array(data.length).fill(averageValue);
-  };
-  const composeDataWithAverageValue = (valuesArray, averageValuesArray) => {
-    return [
-      {
-        data: valuesArray,
-        svg: { strokeWidth: 3 },
-      },
-      {
-        data: averageValuesArray,
-        svg: { strokeWidth: 1.5, strokeDasharray: [8, 16] },
-      },
-    ];
-  };
-  const averageValuesArray = createAverageValuesArray(data2);
-  const dataWithAverageValue = composeDataWithAverageValue(
-    data2,
-    averageValuesArray
-  );
+  const data2 = [80, 110, 95, 148, 124, 167, 151, 112, 165, 150, 124, 120, 150];
 
   return (
     <PanelContentContainer>
@@ -77,20 +41,27 @@ export const HistoryFetal = () => {
               fill: "grey",
               fontSize: 11,
             }}
-            style={{ marginRight: 5 }}
+            style={{
+              marginRight: 5,
+              position: "absolute",
+              height: "100%",
+            }}
             formatLabel={(value) => `${value}`}
           />
           <LineChart
-            style={{ height: 270 }}
-            gridMin={50}
-            gridMax={150}
-            data={dataWithAverageValue}
-            // curve={shape.curveNatural}
+            style={{ height: 270, width: "86%", marginLeft: 32 }}
+            gridMin={70}
+            gridMax={200}
+            data={data2}
+            curve={shape.curveNatural}
             svg={{
-              stroke: "url(#gradient)",
+              strokeWidth: 2,
+              stroke: "green",
             }}
             contentInset={{ top: 20, bottom: 20 }}
-          ></LineChart>
+          >
+            <Grid />
+          </LineChart>
           <XAxis
             style={{
               marginHorizontal: -10,
@@ -98,7 +69,6 @@ export const HistoryFetal = () => {
               position: "absolute",
               width: "90%",
               bottom: 0,
-
               marginLeft: 25,
             }}
             data={data2}
@@ -106,6 +76,9 @@ export const HistoryFetal = () => {
             contentInset={{ left: 10, right: 10 }}
             svg={{ fontSize: 10, fill: "black" }}
           />
+          <View style={{ position: "absolute", right: 15, top: 10 }}>
+            <FontAwesome5 name="share-alt" size={22} color={colors.text} />
+          </View>
         </ChartContainer>
       </BlockContainer>
       {!selectedItem ? (

@@ -72,4 +72,5 @@ export const ChartContainer = styled.View`
   flex-direction: row;
   margin: 5px;
   position: relative;
+  flex: 1;
 `;
