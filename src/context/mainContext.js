@@ -40,9 +40,9 @@ export const AppProvider = ({ children }) => {
     }
   };
   // AsyncStorage.clear();
-
+  console.log(device);
   const saveUserToStorage = async (userObject) => {
-    setUser(userObject);
+    setUser("user : ", userObject);
     try {
       const stringified = await JSON.stringify(userObject);
       console.log("stringified", stringified);
@@ -52,9 +52,10 @@ export const AppProvider = ({ children }) => {
       console.log(error);
     }
   };
-  const saveDeviceToStorage = async (device) => {
+  const saveDeviceToStorage = async (newDevice) => {
+    console.log("saving to storage device : ", newDevice);
     try {
-      const stringified = await JSON.stringify({ state: device });
+      const stringified = await JSON.stringify({ state: newDevice });
       await AsyncStorage.setItem("@Device", stringified);
     } catch (error) {
       console.log(error);
@@ -64,7 +65,6 @@ export const AppProvider = ({ children }) => {
   const saveSoundToStorage = async (sound) => {
     const copyState = [sound, ...dopDataArray];
     setDopDataArray(copyState);
-    console.log("is trying to save sound", copyState);
     try {
       const stringified = await JSON.stringify(copyState);
       await AsyncStorage.setItem("@Sound", stringified);
@@ -72,7 +72,16 @@ export const AppProvider = ({ children }) => {
       console.log(error);
     }
   };
-  // console.log("dop data array is :", dopDataArray);
+  const saveSoundDeletedToStorage = async (newArray) => {
+    setDopDataArray(newArray);
+    try {
+      const stringified = await JSON.stringify(newArray);
+      await AsyncStorage.setItem("@Sound", stringified);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const ctx = React.useMemo(
     () => ({
       user,
@@ -86,6 +95,7 @@ export const AppProvider = ({ children }) => {
       saveUserToStorage,
       checkStorage,
       setDopDataArray,
+      saveSoundDeletedToStorage,
     }),
     [isRegistered, device, , user, dopDataArray]
   );

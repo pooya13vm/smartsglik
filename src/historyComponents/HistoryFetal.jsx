@@ -1,10 +1,10 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import {
   BlockContainer,
   ChartContainer,
   PanelContentContainer,
 } from "../styles";
-import { View } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { XAxis, YAxis, LineChart, Grid } from "react-native-svg-charts";
 import { AppContext } from "../context/mainContext";
@@ -12,6 +12,7 @@ import HistoryFetalList from "../components/HistoryFetalList";
 import HistoryFetalItem from "../components/HistoryFetalItem";
 import { colors } from "../assets/utility/colors";
 import * as shape from "d3-shape";
+import Share from "react-native-share";
 
 export const HistoryFetal = () => {
   // states
@@ -19,6 +20,24 @@ export const HistoryFetal = () => {
   const [componentWidth, setComponentWidth] = useState(0);
   // context
   const { dopDataArray } = useContext(AppContext);
+
+  const chartRef = useRef(null);
+  // ----------------------- share sound ---------------------->
+  const shareChart = async () => {
+    const svgData = chartRef.current;
+    console.log(svgData);
+    // try {
+    //   const options = {
+    //     url: svgData,
+    //     type: "image/svg+xml",
+    //     message: "çocuk kalbimin kayıtlı sesi",
+    //   };
+    //   await Share.open(options);
+    //   console.log("shared successfully");
+    // } catch (error) {
+    //   console.log("Error sharing sound:", error.message);
+    // }
+  };
 
   // const data2 = [];
   // useEffect(() => {
@@ -31,7 +50,7 @@ export const HistoryFetal = () => {
   return (
     <PanelContentContainer>
       <BlockContainer>
-        <ChartContainer>
+        <ChartContainer ref={chartRef}>
           <YAxis
             data={data2}
             contentInset={{ top: 20, bottom: 20 }}
@@ -76,9 +95,12 @@ export const HistoryFetal = () => {
             contentInset={{ left: 10, right: 10 }}
             svg={{ fontSize: 10, fill: "black" }}
           />
-          <View style={{ position: "absolute", right: 15, top: 10 }}>
+          <TouchableOpacity
+            onPress={shareChart}
+            style={{ position: "absolute", right: 15, top: 10 }}
+          >
             <FontAwesome5 name="share-alt" size={22} color={colors.text} />
-          </View>
+          </TouchableOpacity>
         </ChartContainer>
       </BlockContainer>
       {!selectedItem ? (

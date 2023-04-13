@@ -13,7 +13,7 @@ import HistoryOxim from "../historyComponents/HistoryOxim";
 const History = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
   const [showDevicesModal, setShowDevicesModal] = useState(false);
-  const { setDevice, device } = useContext(AppContext);
+  const { setDevice, device, saveDeviceToStorage } = useContext(AppContext);
   return (
     <ScreenLayout
       header={
@@ -31,6 +31,7 @@ const History = ({ navigation }) => {
         setDevice={setDevice}
         setShowDevicesModal={setShowDevicesModal}
         setFirstTime={false}
+        saveDeviceToStorage={saveDeviceToStorage}
       />
     </ScreenLayout>
   );

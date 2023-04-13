@@ -56,7 +56,8 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
   const [sound, setSound] = useState();
   const [warningModalV, SetWarningModalV] = useState(false);
 
-  const { dopDataArray, setDopDataArray } = useContext(AppContext);
+  const { dopDataArray, setDopDataArray, saveSoundDeletedToStorage } =
+    useContext(AppContext);
 
   // ----------------------- start playing sound ---------------------->
   async function playSound() {
@@ -99,6 +100,7 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
       await FileSystem.deleteAsync(item.uri);
       console.log(`Sound file at ${item.uri} was deleted successfully`);
       const filtered = dopDataArray.filter((item) => item.id !== selectedItem);
+      saveSoundDeletedToStorage(filtered);
       setDopDataArray(filtered);
       setSelectedItem(null);
     } catch (error) {
@@ -153,8 +155,10 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
             <TitleText>{`     Maks : 95`}</TitleText>
           </Row>
           <Row>
-            <TitleText>{item.date.slice(0, 10)}</TitleText>
-            <TitleText>{`       ${item.date.slice(11, 16)}`}</TitleText>
+            <TitleText>{item.date.toString().slice(0, 10)}</TitleText>
+            <TitleText>{`       ${item.date
+              .toString()
+              .slice(11, 16)}`}</TitleText>
           </Row>
           <Slider
             style={{

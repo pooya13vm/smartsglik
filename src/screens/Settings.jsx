@@ -11,7 +11,7 @@ import { colors } from "../assets/utility/colors";
 
 const Settings = ({ navigation }) => {
   const [showDevicesModal, setShowDevicesModal] = useState(false);
-  const { setDevice } = useContext(AppContext);
+  const { setDevice, saveDeviceToStorage } = useContext(AppContext);
   return (
     <ScreenLayout
       header={
@@ -54,6 +54,7 @@ const Settings = ({ navigation }) => {
         setDevice={setDevice}
         setShowDevicesModal={setShowDevicesModal}
         setFirstTime={false}
+        saveDeviceToStorage={saveDeviceToStorage}
       />
     </ScreenLayout>
   );
