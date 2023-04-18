@@ -13,6 +13,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.soloader.SoLoader;
 import com.smartsaglik.newarchitecture.MainApplicationReactNativeHost;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;//added by pooya
 
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
@@ -34,11 +35,8 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       @SuppressWarnings("UnnecessaryLocalVariable")
-      List<ReactPackage> packages = new PackageList(this).getPackages(
-        // new ReactNativeFirebaseAppPackage()
-      );
-      // added by pooya
-      // packages.add(new ReactNativeFirebaseAppPackage());
+      List<ReactPackage> packages = new PackageList(this).getPackages();
+      // packages.add(new ReactNativePushNotificationPackage()); 
       return packages;
     }
 

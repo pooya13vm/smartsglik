@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-// apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.gms.google-services"
 
 import com.android.build.OutputFile
 
@@ -276,9 +276,13 @@ android {
 }
 
 dependencies {
+
+    implementation project(':react-native-push-notification')//added by pooya
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation platform('com.google.firebase:firebase-bom:31.2.3') //added by pooya
-    implementation 'com.google.firebase:firebase-analytics-ktx' //added by pooya
+    //** */
+    implementation 'com.google.firebase:firebase-analytics:17.3.0'
+    // implementation platform('com.google.firebase:firebase-bom:31.2.3') //added by pooya
+    // implementation 'com.google.firebase:firebase-analytics-ktx' //added by pooya
     // implementation project(path: ":@react-native-firebase_app") //added by pooya
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:0.70.5"  // From node_modules

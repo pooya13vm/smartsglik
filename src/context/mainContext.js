@@ -6,13 +6,15 @@ export const AppProvider = ({ children }) => {
   const [isRegistered, setRegister] = useState(false);
   const [device, setDevice] = useState("");
   const [dopDataArray, setDopDataArray] = useState([]);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState([]);
+  const [userUpdated, setUserUpdated] = useState(false);
+  const [alarms, setAlarms] = useState([]);
 
   const checkStorage = async () => {
     try {
       const getST = await AsyncStorage.getItem("@User");
       const parsST = JSON.parse(getST);
-      if (parsST?.name) {
+      if (parsST.length > 0) {
         setUser(parsST);
         setRegister(true);
       }
@@ -31,29 +33,58 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Sound");
       const parsST = JSON.parse(getST);
-      console.log("sound :", parsST);
       if (parsST.length > 0) {
         setDopDataArray(parsST);
       }
     } catch (error) {
       console.log(error);
     }
+    try {
+      const getST = await AsyncStorage.getItem("@Alarms");
+      const parsST = JSON.parse(getST);
+      console.log("alarms:", parsST);
+      if (parsST.length > 0) {
+        setAlarms(parsST);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   // AsyncStorage.clear();
-  console.log(device);
-  const saveUserToStorage = async (userObject) => {
-    setUser("user : ", userObject);
+
+  const saveNewUser = (userObject) => {
+    userObject.status = "active";
+    let userCopy = [...user];
+    userCopy.map((item, index) => {
+      if (item.status === "active") {
+        userCopy[index].status = "noActive";
+      }
+    });
+    userCopy.push(userObject);
+    setUser(userCopy);
+    saveUserToStorage(userCopy);
+    console.log("is saving : ", userCopy);
+  };
+
+  const updateUsers = (newArray) => {
+    console.log("in update user ....");
+    setUser(newArray);
+    saveUserToStorage(newArray);
+    setUserUpdated((per) => !per);
+  };
+
+  const saveUserToStorage = async (userArray) => {
     try {
-      const stringified = await JSON.stringify(userObject);
+      const stringified = await JSON.stringify(userArray);
       console.log("stringified", stringified);
       await AsyncStorage.setItem("@User", stringified);
+
       console.log("saved ....");
     } catch (error) {
       console.log(error);
     }
   };
   const saveDeviceToStorage = async (newDevice) => {
-    console.log("saving to storage device : ", newDevice);
     try {
       const stringified = await JSON.stringify({ state: newDevice });
       await AsyncStorage.setItem("@Device", stringified);
@@ -81,6 +112,26 @@ export const AppProvider = ({ children }) => {
       console.log(error);
     }
   };
+  const saveNewAlarm = (newAlarm) => {
+    console.log("new alarm is:", newAlarm);
+    const newArray = [newAlarm, ...alarms];
+    setAlarms(newArray);
+    saveAlarmToStorage(newArray);
+  };
+  const deleteAlarmHandler = (id) => {
+    const newAlarm = [...alarms];
+    const filtered = newAlarm.filter((item) => item.id !== id);
+    setAlarms(filtered);
+    saveAlarmToStorage(filtered);
+  };
+  const saveAlarmToStorage = async (newArray) => {
+    try {
+      const stringified = await JSON.stringify(newArray);
+      await AsyncStorage.setItem("@Alarms", stringified);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const ctx = React.useMemo(
     () => ({
@@ -88,16 +139,21 @@ export const AppProvider = ({ children }) => {
       isRegistered,
       device,
       dopDataArray,
+      userUpdated,
+      alarms,
+      saveNewAlarm,
       saveDeviceToStorage,
       saveSoundToStorage,
       setRegister,
       setDevice,
-      saveUserToStorage,
+      saveNewUser,
       checkStorage,
       setDopDataArray,
       saveSoundDeletedToStorage,
+      updateUsers,
+      deleteAlarmHandler,
     }),
-    [isRegistered, device, , user, dopDataArray]
+    [isRegistered, device, , user, dopDataArray, userUpdated, alarms]
   );
   return <AppContext.Provider value={ctx}>{children}</AppContext.Provider>;
 };

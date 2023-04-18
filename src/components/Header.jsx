@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import { AppContext } from "../context/mainContext";
 import { DescriptionText } from "./DescriptionText";
@@ -11,7 +11,16 @@ export const Header = ({
   isPanel,
   connectingToDevice,
 }) => {
-  const { device, user } = useContext(AppContext);
+  const [activeUser, setActiveUser] = useState({});
+  const { device, user, userUpdated } = useContext(AppContext);
+
+  useEffect(() => {
+    user.map((item, index) => {
+      if (item.status === "active") {
+        setActiveUser(user[index]);
+      }
+    });
+  }, [userUpdated]);
 
   const imageAddressHandler = () => {
     if (device === "Fetal Doppler")
@@ -40,7 +49,7 @@ export const Header = ({
         }}
       >
         <FontAwesome name="user" color={colors.text} size={20} />
-        <DescriptionText children={user.name} size={17} />
+        <DescriptionText children={activeUser?.name} size={17} />
       </View>
       <TouchableOpacity
         onLongPress={() => setShowDevicesModal(true)}

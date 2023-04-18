@@ -25,18 +25,19 @@ export const SettingItemContainer = styled.TouchableOpacity`
   shadow-radius: 12px;
   elevation: 14;
 `;
-export const ListItemContainer = styled.TouchableOpacity`
+export const ListItemContainer = styled.View`
   flex-direction: row;
   background-color: ${colors.white};
   margin: 15px 0px;
   padding: 10px 20px;
-  border-radius: 35px;
+  border-radius: 20px;
   width: 100%;
   shadow-color: #000;
   shadow-offset: 1px 10px;
   shadow-opacity: 0.5;
   shadow-radius: 30px;
   elevation: 8;
+  justify-content: space-between;
 `;
 export const CarouselContainer = styled.View`
   align-self: center;

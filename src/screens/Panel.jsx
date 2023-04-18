@@ -45,7 +45,7 @@ const Panel = (props) => {
   const { device, setDevice, saveDeviceToStorage } = useContext(AppContext);
   //--------------- states --------------------
   const [isScanning, setScanning] = useState(false);
-  const [isConnected, setConnected] = useState(true);
+  const [isConnected, setConnected] = useState(false);
   const [showDevicesModal, setShowDevicesModal] = useState(false);
   const [connectedDevice, setConnectedDevice] = useState();
   const [isBluetoothModal, setBluetoothModal] = useState(false);

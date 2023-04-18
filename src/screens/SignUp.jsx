@@ -5,7 +5,6 @@ import {
   BackHandler,
   ScrollView,
   Keyboard,
-  // ActivityIndicator,
 } from "react-native";
 // import firebase from "../database/firebase";
 import { FormScreenBg } from "../components/FormScreenBg";
@@ -87,7 +86,7 @@ function SignUp({ navigation }) {
   const [selectedSex, setSelectedSex] = useState("");
   const [warningModalVisibility, setWarningModalVisibility] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
-  // const [isLoading, setLoading] = useState(false);
+
   const INITIAL_STATE = {
     name: "",
     birthDay: "",
@@ -142,7 +141,7 @@ function SignUp({ navigation }) {
   };
   const [state, dispatch] = useReducer(registerReducer, INITIAL_STATE);
   const { name, birthDay, sex, tall, weight, email, pass } = state;
-  const { saveUserToStorage } = useContext(AppContext);
+  const { saveNewUser } = useContext(AppContext);
 
   const datePickerHandler = (event, selectedDate) => {
     if (event.type === "set") {
@@ -174,7 +173,7 @@ function SignUp({ navigation }) {
       if (isChecked1 && isChecked2) {
         if (emailValidate(email)) {
           navigation.navigate("Home");
-          saveUserToStorage(state);
+          saveNewUser(state);
         } else {
           setWarningMessage("Lütfen Geçerli Eposta Adresini Giriniz");
           setWarningModalVisibility(true);
@@ -287,13 +286,12 @@ function SignUp({ navigation }) {
           title="Kayıt Ol"
           onPressFun={() => {
             RegisterUserHandler();
-            // navigation.navigate("Home")
           }}
         />
       </ButtonContainer>
-      <ButtonContainer onPress={() => navigation.navigate("SignIn")}>
+      {/* <ButtonContainer onPress={() => navigation.navigate("SignIn")}>
         <SendToSigInText>Hesabın Var Mı ?</SendToSigInText>
-      </ButtonContainer>
+      </ButtonContainer> */}
       {/* ----------------first modal---------- */}
       <ModalContainer heightPercentage={53} isModalVisible={isModalVisible}>
         <ModalTitle>
