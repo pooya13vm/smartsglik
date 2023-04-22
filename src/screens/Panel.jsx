@@ -95,6 +95,7 @@ const Panel = (props) => {
       setScanning(false);
     }, 5000);
   };
+
   //---------------------connecting to device -------------------
   async function connectDevice(device) {
     device
@@ -129,12 +130,13 @@ const Panel = (props) => {
                 .replace(/\s\s+/g, " ")
                 .charCodeAt(11);
               setMessage(message);
-              console.log("characteristic :", message);
+              // console.log("characteristic :", message);
             }
           }
         );
       });
   }
+
   //------------------disconnect function --------------------------
   async function disconnectBluetooth() {
     if (connectedDevice != null) {
@@ -185,7 +187,10 @@ const Panel = (props) => {
       <MainScreensContainer>
         {!isConnected && device === "Fetal Doppler" && <DoppDisconnect />}
         {isConnected && device === "Fetal Doppler" && (
-          <DoppConnect message={message} />
+          <DoppConnect
+            message={message}
+            disconnectBluetooth={disconnectBluetooth}
+          />
         )}
         {!isConnected && device === "Oksimetre" && <OximDisconnect />}
         {isConnected && device === "Oksimetre" && <OximConnect />}

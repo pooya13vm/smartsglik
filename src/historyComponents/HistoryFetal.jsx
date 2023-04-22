@@ -4,7 +4,7 @@ import {
   ChartContainer,
   PanelContentContainer,
 } from "../styles";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { XAxis, YAxis, LineChart, Grid } from "react-native-svg-charts";
 import { AppContext } from "../context/mainContext";
@@ -13,96 +13,105 @@ import HistoryFetalItem from "../components/HistoryFetalItem";
 import { colors } from "../assets/utility/colors";
 import * as shape from "d3-shape";
 import Share from "react-native-share";
+import ViewShot, { captureRef } from "react-native-view-shot";
+import { TitleText } from "../components/TitleText";
 
 export const HistoryFetal = () => {
   // states
   const [selectedItem, setSelectedItem] = useState(null);
-  const [componentWidth, setComponentWidth] = useState(0);
+  const [data, setData] = useState([]);
   // context
   const { dopDataArray } = useContext(AppContext);
-
   const chartRef = useRef(null);
+
   // ----------------------- share sound ---------------------->
   const shareChart = async () => {
-    const svgData = chartRef.current;
-    console.log(svgData);
-    // try {
-    //   const options = {
-    //     url: svgData,
-    //     type: "image/svg+xml",
-    //     message: "çocuk kalbimin kayıtlı sesi",
-    //   };
-    //   await Share.open(options);
-    //   console.log("shared successfully");
-    // } catch (error) {
-    //   console.log("Error sharing sound:", error.message);
-    // }
+    try {
+      const uri = await captureRef(chartRef, {
+        format: "png",
+        quality: 0.7,
+      });
+      await Share.open({ url: uri, type: "image/png" });
+    } catch (error) {
+      console.log("Error:", error.message);
+    }
   };
 
-  // const data2 = [];
-  // useEffect(() => {
-  //   dopDataArray.map((item) => {
-  //     data2.push(item.average);
-  //   });
-  // }, []);
-  const data2 = [80, 110, 95, 148, 124, 167, 151, 112, 165, 150, 124, 120, 150];
+  useEffect(() => {
+    let myArray = [];
+    dopDataArray.map((item) => {
+      myArray.unshift(item.average);
+    });
+    setData(myArray);
+  }, [dopDataArray.length]);
 
   return (
     <PanelContentContainer>
-      <BlockContainer>
-        <ChartContainer ref={chartRef}>
-          <YAxis
-            data={data2}
-            contentInset={{ top: 20, bottom: 20 }}
-            min={70}
-            max={200}
-            svg={{
-              fill: "grey",
-              fontSize: 11,
-            }}
-            style={{
-              marginRight: 5,
-              position: "absolute",
-              height: "100%",
-            }}
-            formatLabel={(value) => `${value}`}
-          />
-          <LineChart
-            style={{ height: 270, width: "86%", marginLeft: 32 }}
-            gridMin={70}
-            gridMax={200}
-            data={data2}
-            curve={shape.curveNatural}
-            svg={{
-              strokeWidth: 2,
-              stroke: "green",
-            }}
-            contentInset={{ top: 20, bottom: 20 }}
-          >
-            <Grid />
-          </LineChart>
-          <XAxis
-            style={{
-              marginHorizontal: -10,
-              marginTop: 10,
-              position: "absolute",
-              width: "90%",
-              bottom: 0,
-              marginLeft: 25,
-            }}
-            data={data2}
-            formatLabel={(value, index) => index + 1}
-            contentInset={{ left: 10, right: 10 }}
-            svg={{ fontSize: 10, fill: "black" }}
-          />
-          <TouchableOpacity
-            onPress={shareChart}
-            style={{ position: "absolute", right: 15, top: 10 }}
-          >
-            <FontAwesome5 name="share-alt" size={22} color={colors.text} />
-          </TouchableOpacity>
-        </ChartContainer>
-      </BlockContainer>
+      {dopDataArray.length > 0 ? (
+        <BlockContainer>
+          <ChartContainer>
+            <ViewShot
+              style={{ flex: 1, backgroundColor: colors.lightBlue }}
+              ref={chartRef}
+            >
+              <YAxis
+                data={data}
+                contentInset={{ top: 20, bottom: 20 }}
+                min={70}
+                max={200}
+                svg={{
+                  fill: "grey",
+                  fontSize: 11,
+                }}
+                style={{
+                  marginRight: 5,
+                  position: "absolute",
+                  height: "100%",
+                }}
+                formatLabel={(value) => `${value}`}
+              />
+              <LineChart
+                style={{ height: 270, width: "86%", marginLeft: 32 }}
+                gridMin={70}
+                gridMax={200}
+                data={data}
+                curve={shape.curveNatural}
+                svg={{
+                  strokeWidth: 2,
+                  stroke: "green",
+                }}
+                contentInset={{ top: 20, bottom: 20 }}
+              >
+                <Grid />
+              </LineChart>
+              <XAxis
+                style={{
+                  marginHorizontal: -10,
+                  marginTop: 10,
+                  position: "absolute",
+                  width: "90%",
+                  bottom: 0,
+                  marginLeft: 25,
+                }}
+                data={data}
+                formatLabel={(value, index) =>
+                  dopDataArray[index]?.date.toString().slice(5, 10)
+                }
+                contentInset={{ left: 10, right: 10 }}
+                svg={{ fontSize: 10, fill: "gray" }}
+              />
+            </ViewShot>
+            <TouchableOpacity
+              onPress={shareChart}
+              style={{ position: "absolute", right: 15, top: 10 }}
+            >
+              <FontAwesome5 name="share-alt" size={22} color={colors.text} />
+            </TouchableOpacity>
+          </ChartContainer>
+        </BlockContainer>
+      ) : (
+        <TitleText children={"Listede öğe yok"} />
+      )}
       {!selectedItem ? (
         <HistoryFetalList
           dopDataArray={dopDataArray}

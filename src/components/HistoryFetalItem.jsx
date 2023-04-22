@@ -41,6 +41,7 @@ const FontAwesomeContainer = styled.TouchableOpacity`
   padding-horizontal: 18px;
   border-radius: 50px;
   border-color: ${colors.text};
+  opacity: ${(props) => (props.opacity ? 0.7 : 1)};
 `;
 const PlayControlContainer = styled.View`
   flex-direction: row;
@@ -61,17 +62,19 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
 
   // ----------------------- start playing sound ---------------------->
   async function playSound() {
-    setIsPlaying(true);
-    await sound.playAsync();
-    const status = await sound.getStatusAsync();
-    sound.setOnPlaybackStatusUpdate((status) => {
-      console.log("my in status :", status.positionMillis);
-      setSliderValue(status.positionMillis);
-      if (status.didJustFinish) {
-        setIsPlaying(false);
-        setSliderValue(0);
-      }
-    });
+    if (item.sound) {
+      setIsPlaying(true);
+      await sound.playAsync();
+      const status = await sound.getStatusAsync();
+      sound.setOnPlaybackStatusUpdate((status) => {
+        console.log("my in status :", status.positionMillis);
+        setSliderValue(status.positionMillis);
+        if (status.didJustFinish) {
+          setIsPlaying(false);
+          setSliderValue(0);
+        }
+      });
+    }
   }
   // ----------------------- stop playing sound ---------------------->
   const stopPlaySound = async () => {
@@ -82,23 +85,27 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
   };
   // ----------------------- share sound ---------------------->
   const shareRecording = async () => {
-    try {
-      const options = {
-        url: item.uri,
-        type: "audio/m4a",
-        message: "çocuk kalbimin kayıtlı sesi",
-      };
-      await Share.open(options);
-      console.log("Sound shared successfully");
-    } catch (error) {
-      console.log("Error sharing sound:", error.message);
+    if (item.sound) {
+      try {
+        const options = {
+          url: item.uri,
+          type: "audio/m4a",
+          message: "çocuk kalbimin kayıtlı sesi",
+        };
+        await Share.open(options);
+        console.log("Sound shared successfully");
+      } catch (error) {
+        console.log("Error sharing sound:", error.message);
+      }
     }
   };
   // ----------------------- delete sound ---------------------->
   async function deleteSoundFile() {
     try {
-      await FileSystem.deleteAsync(item.uri);
-      console.log(`Sound file at ${item.uri} was deleted successfully`);
+      if (item.sound) {
+        await FileSystem.deleteAsync(item.uri);
+        console.log(`Sound file at ${item.uri} was deleted successfully`);
+      }
       const filtered = dopDataArray.filter((item) => item.id !== selectedItem);
       saveSoundDeletedToStorage(filtered);
       setDopDataArray(filtered);
@@ -113,16 +120,17 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
   useEffect(() => {
     const item = dopDataArray.filter((item) => item.id == selectedItem);
     setItem(item[0]);
-    setRecordingTime(item[0].duration);
+    setRecordingTime(item[0]?.duration);
     async function loadSound() {
-      console.log(item[0].uri);
       const source = {
         uri: `${item[0].uri}`,
       };
       const { sound } = await Audio.Sound.createAsync(source);
       setSound(sound);
     }
-    loadSound();
+    if (item.sound) {
+      loadSound();
+    }
   }, []);
   return (
     <>
@@ -132,7 +140,11 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
             <AntDesignContainer onPress={() => setSelectedItem(null)}>
               <AntDesign name="back" size={24} color={colors.text} />
             </AntDesignContainer>
-            <FontAwesomeContainer onPress={shareRecording}>
+            <FontAwesomeContainer
+              onPress={shareRecording}
+              disabled={!item.sound && true}
+              opacity={!item.sound && true}
+            >
               <FontAwesome5 name="share-alt" size={24} color={colors.text} />
             </FontAwesomeContainer>
             <FontAwesomeContainer onPress={() => SetWarningModalV(true)}>
@@ -141,6 +153,8 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
 
             <FontAwesomeContainer
               onPress={!isPlaying ? playSound : stopPlaySound}
+              disabled={!item.sound && true}
+              opacity={!item.sound && true}
             >
               <FontAwesome5
                 name={isPlaying ? "stop" : "play"}
@@ -150,9 +164,15 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
             </FontAwesomeContainer>
           </IconContainer>
           <Row>
-            <TitleText>{`Min : 87     `}</TitleText>
+            <TitleText>{`Min : ${Math.min.apply(
+              Math,
+              item.beatArray
+            )}     `}</TitleText>
             <Fontisto name="heartbeat-alt" size={33} color={colors.text} />
-            <TitleText>{`     Maks : 95`}</TitleText>
+            <TitleText>{`     Maks : ${Math.max.apply(
+              Math,
+              item.beatArray
+            )}`}</TitleText>
           </Row>
           <Row>
             <TitleText>{item.date.toString().slice(0, 10)}</TitleText>

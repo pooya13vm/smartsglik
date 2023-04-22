@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { colors } from "../assets/utility/colors";
 import { BlockContainer, PanelContentContainer, BlockTitle } from "../styles";
 import { ProgressCircle } from "react-native-svg-charts";
@@ -41,7 +41,7 @@ const TopText = styled.Text`
   margin-bottom: 10px;
 `;
 
-const DoppConnect = ({ message }) => {
+const DoppConnect = ({ message, disconnectBluetooth }) => {
   const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isFinishedRec, setIsFinishedRec] = useState(false);
@@ -51,9 +51,9 @@ const DoppConnect = ({ message }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sliderValue, setSliderValue] = useState(Number);
   const [isVisibleModal, setIsVisibleModal] = useState(false);
-  const [heartBeat, setHeartBeat] = useState([]);
 
-  const { saveSoundToStorage } = useContext(AppContext);
+  const { saveSoundToStorage, heartBeat, setHeartBeat } =
+    useContext(AppContext);
 
   function formatTime(milliseconds) {
     let totalSeconds = Math.floor(milliseconds / 1000);
@@ -103,25 +103,34 @@ const DoppConnect = ({ message }) => {
     try {
       console.log("in stop recording");
       await recording.stopAndUnloadAsync();
-      const { sound } = await recording.createNewLoadedSoundAsync();
-
-      const average =
-        heartBeat.length > 0
-          ? heartBeat.reduce((a, b) => a + b, 0) / heartBeat.length
-          : 0;
-      let mySoundObj = {
-        sound: sound,
-        id: uuid.v4(),
-        beatArray: heartBeat,
-        date: new Date(),
-        uri: recording.getURI(),
-        average: average,
-        duration: recordingTime,
-      };
-      console.log("in stop recording sound object : ", mySoundObj);
-      setSoundObject(mySoundObj);
       setIsRecording(false);
-      setIsVisibleModal(true);
+      if (heartBeat.length > 0) {
+        const { sound } = await recording.createNewLoadedSoundAsync();
+
+        const average =
+          heartBeat.length > 0
+            ? Math.floor(
+                heartBeat.reduce((a, b) => a + b, 0) / heartBeat.length
+              )
+            : 0;
+        let mySoundObj = {
+          sound: sound,
+          id: uuid.v4(),
+          beatArray: heartBeat,
+          date: new Date(),
+          uri: recording.getURI(),
+          average: average,
+          duration: recordingTime,
+        };
+        console.log("in stop recording sound object : ", mySoundObj);
+        setSoundObject(mySoundObj);
+        setIsVisibleModal(true);
+      } else {
+        Alert.alert("Cihazdan bilgi alınmadı");
+        setRecordingTime(0);
+        setSoundObject({});
+        setSliderValue(0);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -153,6 +162,7 @@ const DoppConnect = ({ message }) => {
     setIsVisibleModal(false);
     setIsFinishedRec(true);
     setHeartBeat([]);
+    disconnectBluetooth();
   };
   const noSaveHandler = () => {
     setIsVisibleModal(false);
@@ -160,6 +170,7 @@ const DoppConnect = ({ message }) => {
     setRecordingTime(0);
     setSoundObject({});
     setSliderValue(0);
+    disconnectBluetooth();
   };
 
   useEffect(() => {
@@ -169,6 +180,15 @@ const DoppConnect = ({ message }) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    console.log("in if resived message :", message);
+    if (heartBeat.indexOf(message) == -1) {
+      if (message != 0 && message !== null)
+        setHeartBeat([...heartBeat, message]);
+    }
+  }, [message]);
+
   useEffect(() => {
     if (recording) {
       const interval = setInterval(() => {
@@ -178,17 +198,12 @@ const DoppConnect = ({ message }) => {
           setSVGHeight(metering + 125);
         });
       }, 100);
-      if (message) {
-        let beatArray = [];
-        beatArray.push(message);
-        setHeartBeat(beatArray);
-      }
 
       return () => {
         clearInterval(interval);
       };
     }
-  }, [recording, message]);
+  }, [recording]);
 
   return (
     <PanelContentContainer>
@@ -209,7 +224,7 @@ const DoppConnect = ({ message }) => {
               width: "80%",
               alignSelf: "center",
             }}
-            progress={(message - 50) / 100}
+            progress={(message - 70) / 130}
             progressColor={colors.text}
             backgroundColor={colors.white}
             strokeWidth={30}
@@ -300,7 +315,7 @@ const DoppConnect = ({ message }) => {
                 marginLeft: 30,
               }}
             >
-              {`is ${formatTime(recordingTime)}`}
+              {`${formatTime(recordingTime)}`}
             </Text>
             <VoiceSVG svgHeight={svgHeight} />
           </>

@@ -9,6 +9,8 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState([]);
   const [userUpdated, setUserUpdated] = useState(false);
   const [alarms, setAlarms] = useState([]);
+  const [isConnected, setConnected] = useState(false);
+  const [heartBeat, setHeartBeat] = useState([]);
 
   const checkStorage = async () => {
     try {
@@ -33,6 +35,7 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Sound");
       const parsST = JSON.parse(getST);
+      console.log("sound:", parsST);
       if (parsST.length > 0) {
         setDopDataArray(parsST);
       }
@@ -42,7 +45,6 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Alarms");
       const parsST = JSON.parse(getST);
-      console.log("alarms:", parsST);
       if (parsST.length > 0) {
         setAlarms(parsST);
       }
@@ -141,6 +143,8 @@ export const AppProvider = ({ children }) => {
       dopDataArray,
       userUpdated,
       alarms,
+      heartBeat,
+      setHeartBeat,
       saveNewAlarm,
       saveDeviceToStorage,
       saveSoundToStorage,
@@ -153,7 +157,7 @@ export const AppProvider = ({ children }) => {
       updateUsers,
       deleteAlarmHandler,
     }),
-    [isRegistered, device, , user, dopDataArray, userUpdated, alarms]
+    [isRegistered, device, user, dopDataArray, userUpdated, alarms, heartBeat]
   );
   return <AppContext.Provider value={ctx}>{children}</AppContext.Provider>;
 };

@@ -4,6 +4,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
   function formatTime(milliseconds) {
+    if (!milliseconds) return "Ses Yok";
     let totalSeconds = Math.floor(milliseconds / 1000);
     let minutes = Math.floor(totalSeconds / 60);
     let seconds = totalSeconds % 60;
@@ -100,7 +101,8 @@ const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
                       fontWeight: "500",
                     }}
                   >
-                    {item.average} <Text style={{ fontSize: 12 }}>BPS</Text>
+                    {Math.floor(item.average)}
+                    <Text style={{ fontSize: 12 }}>BPS</Text>
                   </Text>
                 </View>
               </View>
