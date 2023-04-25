@@ -306,7 +306,10 @@ function SignUp({ navigation }) {
         </ModalTitle>
         <ModalLinkPartContainer>
           <ModalLinkPartTitle>Satın Almak Için:</ModalLinkPartTitle>
-          <LinkedText text="www.sush.com.tr" url="www.sush.com.tr" />
+          <LinkedText
+            text="www.sush.com.tr"
+            url="https://www.sush.com.tr/magaza"
+          />
         </ModalLinkPartContainer>
         <ModalButtonContainer>
           <ModalOutlineButton onPress={() => BackHandler.exitApp()}>

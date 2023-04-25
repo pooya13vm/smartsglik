@@ -63,10 +63,11 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
   // ----------------------- start playing sound ---------------------->
   async function playSound() {
     if (item.sound) {
+      console.log(item.sound);
       setIsPlaying(true);
-      await sound.playAsync();
-      const status = await sound.getStatusAsync();
-      sound.setOnPlaybackStatusUpdate((status) => {
+      await item.sound.playAsync();
+      const status = await item.sound.getStatusAsync();
+      item.sound.setOnPlaybackStatusUpdate((status) => {
         console.log("my in status :", status.positionMillis);
         setSliderValue(status.positionMillis);
         if (status.didJustFinish) {

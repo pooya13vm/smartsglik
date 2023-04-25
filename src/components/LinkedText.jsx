@@ -1,11 +1,11 @@
 import { useCallback } from "react";
-import { View, Text, Linking, TouchableOpacity } from "react-native";
+import { Text, Linking, TouchableOpacity, Alert } from "react-native";
 import { colors } from "../assets/utility/colors";
 
 const LinkedText = ({ url, text, size = 15 }) => {
   const handleURLPress = useCallback(async () => {
+    console.log("url in linked text:", url);
     const supported = await Linking.canOpenURL(url);
-
     if (supported) {
       await Linking.openURL(url);
     } else {

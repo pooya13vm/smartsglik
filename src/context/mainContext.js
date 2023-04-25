@@ -35,7 +35,7 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Sound");
       const parsST = JSON.parse(getST);
-      console.log("sound:", parsST);
+      // console.log("sound:", parsST);
       if (parsST.length > 0) {
         setDopDataArray(parsST);
       }
@@ -45,6 +45,7 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Alarms");
       const parsST = JSON.parse(getST);
+      console.log("alarm :", parsST);
       if (parsST.length > 0) {
         setAlarms(parsST);
       }

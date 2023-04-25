@@ -1,11 +1,11 @@
 import { useEffect, useState, useContext } from "react";
 import {
   View,
-  Text,
   FlatList,
   useWindowDimensions,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { AppContext } from "../context/mainContext";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
@@ -20,29 +20,34 @@ import AddBtn from "../components/AddBtn";
 import ModalContainer from "../components/ModalContainer";
 import { SubmitBtn } from "../components/SubmitBtn";
 import PushNotification, { Importance } from "react-native-push-notification";
-import uuid from "react-native-uuid";
 
-const ReminderList = ({ navigation }) => {
+const ReminderList = () => {
   const { width, height } = useWindowDimensions();
   const { alarms, saveNewAlarm, deleteAlarmHandler } = useContext(AppContext);
 
-  // const [list, setList] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  // const [isActiveCheck, setActiveCheck] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  // const [selectedTime, setSelectedTime] = useState();
   const [time, setTime] = useState();
   const [alarmMessage, setAlarmMessage] = useState("");
+  const [timeObj, setTimeObj] = useState({ hour: 0, min: 0 });
 
   useEffect(() => {
+    PushNotification.checkPermissions((res) => {
+      if (!res.alert) {
+        Alert.alert(
+          "Bu bölümü kullanmak için bildirimleri kullanma izni verin"
+        );
+      }
+    });
+
     createChannels();
-    // PushNotification.configure({
-    //   permissions: {
-    //     alert: true,
-    //     badge: true,
-    //     sound: true,
-    //   },
-    // });
+    PushNotification.configure({
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+    });
   }, []);
 
   const createChannels = () => {
@@ -51,46 +56,66 @@ const ReminderList = ({ navigation }) => {
       channelName: "Alarm Channel",
       importance: Importance.HIGH,
       playSound: true,
+      soundName: "android.resource://com.xyz/raw/sound1.wav",
+      vibrate: true,
     });
   };
+  function generateUniqueRandomNumber() {
+    const ids = new Set(alarms.map((obj) => obj.id));
+    let randomNum = Math.floor(Math.random() * 100) + 1;
+    while (ids.has(randomNum)) {
+      randomNum = Math.floor(Math.random() * 100) + 1;
+    }
+    return randomNum;
+  }
+
   const handleNotification = () => {
-    console.log("time in notification handler:", time);
-    const itemId = uuid.v4();
+    const UNId = generateUniqueRandomNumber();
     PushNotification.localNotificationSchedule({
       channelId: "alarm-channel",
       title: "Smart Sağlık",
       message: alarmMessage ? alarmMessage : "Tanımsız",
+      bigText: `${timeObj.hour} : ${timeObj.min}`,
       date: time,
       invokeApp: true,
       allowWhileIdle: true,
       playSound: true,
-      soundName: "default",
+      importance: Importance.HIGH,
+      soundName: "sound1",
       repeatType: "day",
       color: colors.lightBlue,
-      id: itemId,
+      id: UNId,
+      vibration: true,
       ignoreInForeground: false,
+      repeatTime: 100,
     });
     const alarmObj = {
-      id: itemId,
-      time: time,
+      id: UNId,
+      time: timeObj,
       message: alarmMessage ? alarmMessage : "Tanımsız",
     };
     saveNewAlarm(alarmObj);
     setShowAddModal(false);
+    setTimeObj({ hour: 0, min: 0 });
+    setShowDatePicker(false);
   };
 
   const datePickerHandler = (event, time) => {
     if (event.type === "set") {
       setTime(time);
-      console.log("date picker finished");
+      const hour = time.getHours();
+      const min = time.getMinutes();
+      setTimeObj({ hour, min });
       setShowDatePicker(false);
       setShowAddModal(true);
     } else {
       setShowDatePicker(false);
     }
   };
+  console.log(showDatePicker);
 
   const deleteHandler = (id) => {
+    PushNotification.cancelLocalNotification(id);
     deleteAlarmHandler(id);
   };
 
@@ -121,24 +146,36 @@ const ReminderList = ({ navigation }) => {
                   style={{
                     flexDirection: "row",
                     width: "100%",
-                    justifyContent: "space-between",
                     alignItems: "center",
                   }}
                 >
                   {item.message && (
                     <>
-                      <DescriptionText size={22}>
-                        {item.message}
-                      </DescriptionText>
-                      <DescriptionText size={22}>
-                        {typeof item.time == "string"
-                          ? item.time.slice(11, 16)
-                          : `${item.time.getHours()} : ${item.time.getMinutes()}`}
-                      </DescriptionText>
+                      <View style={{ width: "45%", overflow: "hidden" }}>
+                        <DescriptionText size={22}>
+                          {item.message}
+                        </DescriptionText>
+                      </View>
+                      <View style={{ width: "10%" }}>
+                        <FontAwesome5
+                          name="bell"
+                          size={22}
+                          color={colors.text}
+                        />
+                      </View>
+
+                      <View style={{ width: "25%", alignItems: "center" }}>
+                        <DescriptionText size={18}>
+                          {item.time.hour} : {item.time.min}
+                        </DescriptionText>
+                      </View>
                     </>
                   )}
-                  <TouchableOpacity onPress={() => deleteHandler(item.id)}>
-                    <FontAwesome5 name="trash" size={24} color={colors.text} />
+                  <TouchableOpacity
+                    onPress={() => deleteHandler(item.id)}
+                    style={{ width: "20%", alignItems: "flex-end" }}
+                  >
+                    <FontAwesome5 name="trash" size={22} color={colors.text} />
                   </TouchableOpacity>
                 </View>
               </ListItemContainer>
@@ -155,7 +192,7 @@ const ReminderList = ({ navigation }) => {
           themeVariant="light"
         />
       )}
-      <ModalContainer heightPercentage={40} isModalVisible={showAddModal}>
+      <ModalContainer heightPercentage={50} isModalVisible={showAddModal}>
         <View
           style={{
             flexDirection: "row",
@@ -192,7 +229,6 @@ const ReminderList = ({ navigation }) => {
           onPress={() => {
             setAlarmMessage("");
             setShowAddModal(false);
-            setTime({});
           }}
           style={{ position: "absolute", top: 15, right: 20 }}
         >

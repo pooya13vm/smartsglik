@@ -90,7 +90,7 @@ const DoppDisconnect = () => {
           }}
         />
       </CarouselContainer>
-      <LinkGroup />
+      <LinkGroup url1="https://www.sush.com.tr/wp-content/uploads/2023/02/Smart-Fetal-Doppler-Kullanim-Kilavuzu.pdf" />
       {/* ---------------modal--------- */}
       <ModalContainer isModalVisible={showSaveModal} heightPercentage={50}>
         <MaterialIcons

@@ -4,14 +4,14 @@ import {
   ChartContainer,
   PanelContentContainer,
 } from "../styles";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { XAxis, YAxis, LineChart, Grid } from "react-native-svg-charts";
 import { AppContext } from "../context/mainContext";
 import HistoryFetalList from "../components/HistoryFetalList";
 import HistoryFetalItem from "../components/HistoryFetalItem";
 import { colors } from "../assets/utility/colors";
-import * as shape from "d3-shape";
+// import * as shape from "d3-shape";
 import Share from "react-native-share";
 import ViewShot, { captureRef } from "react-native-view-shot";
 import { TitleText } from "../components/TitleText";
@@ -20,6 +20,7 @@ export const HistoryFetal = () => {
   // states
   const [selectedItem, setSelectedItem] = useState(null);
   const [data, setData] = useState([]);
+  const [XData, setXData] = useState([]);
   // context
   const { dopDataArray } = useContext(AppContext);
   const chartRef = useRef(null);
@@ -43,6 +44,12 @@ export const HistoryFetal = () => {
       myArray.unshift(item.average);
     });
     setData(myArray);
+    console.log("average array:", myArray);
+    let XArray = [];
+    dopDataArray.map((item) => {
+      XArray.unshift(item?.date.toString().slice(8, 10));
+    });
+    setXData(XArray);
   }, [dopDataArray.length]);
 
   return (
@@ -75,7 +82,7 @@ export const HistoryFetal = () => {
                 gridMin={70}
                 gridMax={200}
                 data={data}
-                curve={shape.curveNatural}
+                // curve={shape.curveNatural}
                 svg={{
                   strokeWidth: 2,
                   stroke: "green",
@@ -94,9 +101,7 @@ export const HistoryFetal = () => {
                   marginLeft: 25,
                 }}
                 data={data}
-                formatLabel={(value, index) =>
-                  dopDataArray[index]?.date.toString().slice(5, 10)
-                }
+                formatLabel={(value, index) => XData[index]}
                 contentInset={{ left: 10, right: 10 }}
                 svg={{ fontSize: 10, fill: "gray" }}
               />

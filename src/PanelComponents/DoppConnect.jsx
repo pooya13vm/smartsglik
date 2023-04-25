@@ -51,6 +51,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sliderValue, setSliderValue] = useState(Number);
   const [isVisibleModal, setIsVisibleModal] = useState(false);
+  const [standbyMode, setStandbyMode] = useState(false);
 
   const { saveSoundToStorage, heartBeat, setHeartBeat } =
     useContext(AppContext);
@@ -79,6 +80,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
   async function startRecording() {
     try {
       console.log("Requesting permissions.....");
+      setStandbyMode(false);
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -125,6 +127,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
         console.log("in stop recording sound object : ", mySoundObj);
         setSoundObject(mySoundObj);
         setIsVisibleModal(true);
+        setStandbyMode(true);
       } else {
         Alert.alert("Cihazdan bilgi alınmadı");
         setRecordingTime(0);
@@ -162,7 +165,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
     setIsVisibleModal(false);
     setIsFinishedRec(true);
     setHeartBeat([]);
-    disconnectBluetooth();
+    // disconnectBluetooth();
   };
   const noSaveHandler = () => {
     setIsVisibleModal(false);
@@ -183,9 +186,11 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
 
   useEffect(() => {
     console.log("in if resived message :", message);
-    if (heartBeat.indexOf(message) == -1) {
-      if (message != 0 && message !== null)
-        setHeartBeat([...heartBeat, message]);
+    if (!standbyMode) {
+      if (heartBeat.indexOf(message) == -1) {
+        if (message != 0 && message !== null)
+          setHeartBeat([...heartBeat, message]);
+      }
     }
   }, [message]);
 
