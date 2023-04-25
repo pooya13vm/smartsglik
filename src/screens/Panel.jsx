@@ -130,7 +130,6 @@ const Panel = (props) => {
                 .replace(/\s\s+/g, " ")
                 .charCodeAt(11);
               setMessage(message);
-              // console.log("characteristic :", message);
             }
           }
         );

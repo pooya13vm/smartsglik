@@ -63,7 +63,6 @@ const UsersList = ({ navigation }) => {
       NewUsersArray[selectedIndex].tall = editedTall;
     }
     if (editedWeight > 0) {
-      console.log(NewUsersArray[selectedIndex].weight);
       NewUsersArray[selectedIndex].weight = editedWeight;
     }
     updateUsers(NewUsersArray);

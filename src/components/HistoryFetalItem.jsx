@@ -43,11 +43,6 @@ const FontAwesomeContainer = styled.TouchableOpacity`
   border-color: ${colors.text};
   opacity: ${(props) => (props.opacity ? 0.7 : 1)};
 `;
-const PlayControlContainer = styled.View`
-  flex-direction: row;
-  width: 100%;
-  justify-content: space-evenly;
-`;
 
 const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -63,12 +58,10 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
   // ----------------------- start playing sound ---------------------->
   async function playSound() {
     if (item.sound) {
-      console.log(item.sound);
       setIsPlaying(true);
-      await item.sound.playAsync();
-      const status = await item.sound.getStatusAsync();
-      item.sound.setOnPlaybackStatusUpdate((status) => {
-        console.log("my in status :", status.positionMillis);
+      await sound.playAsync();
+      const status = await sound.getStatusAsync();
+      sound.setOnPlaybackStatusUpdate((status) => {
         setSliderValue(status.positionMillis);
         if (status.didJustFinish) {
           setIsPlaying(false);
@@ -94,7 +87,6 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
           message: "çocuk kalbimin kayıtlı sesi",
         };
         await Share.open(options);
-        console.log("Sound shared successfully");
       } catch (error) {
         console.log("Error sharing sound:", error.message);
       }
@@ -105,7 +97,6 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
     try {
       if (item.sound) {
         await FileSystem.deleteAsync(item.uri);
-        console.log(`Sound file at ${item.uri} was deleted successfully`);
       }
       const filtered = dopDataArray.filter((item) => item.id !== selectedItem);
       saveSoundDeletedToStorage(filtered);
@@ -122,6 +113,7 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
     const item = dopDataArray.filter((item) => item.id == selectedItem);
     setItem(item[0]);
     setRecordingTime(item[0]?.duration);
+
     async function loadSound() {
       const source = {
         uri: `${item[0].uri}`,
@@ -129,10 +121,9 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
       const { sound } = await Audio.Sound.createAsync(source);
       setSound(sound);
     }
-    if (item.sound) {
-      loadSound();
-    }
+    loadSound();
   }, []);
+
   return (
     <>
       <BlockContainer>

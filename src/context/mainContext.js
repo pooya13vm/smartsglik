@@ -35,7 +35,6 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Sound");
       const parsST = JSON.parse(getST);
-      // console.log("sound:", parsST);
       if (parsST.length > 0) {
         setDopDataArray(parsST);
       }
@@ -45,7 +44,6 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Alarms");
       const parsST = JSON.parse(getST);
-      console.log("alarm :", parsST);
       if (parsST.length > 0) {
         setAlarms(parsST);
       }
@@ -66,11 +64,9 @@ export const AppProvider = ({ children }) => {
     userCopy.push(userObject);
     setUser(userCopy);
     saveUserToStorage(userCopy);
-    console.log("is saving : ", userCopy);
   };
 
   const updateUsers = (newArray) => {
-    console.log("in update user ....");
     setUser(newArray);
     saveUserToStorage(newArray);
     setUserUpdated((per) => !per);
@@ -79,10 +75,7 @@ export const AppProvider = ({ children }) => {
   const saveUserToStorage = async (userArray) => {
     try {
       const stringified = await JSON.stringify(userArray);
-      console.log("stringified", stringified);
       await AsyncStorage.setItem("@User", stringified);
-
-      console.log("saved ....");
     } catch (error) {
       console.log(error);
     }
@@ -116,7 +109,6 @@ export const AppProvider = ({ children }) => {
     }
   };
   const saveNewAlarm = (newAlarm) => {
-    console.log("new alarm is:", newAlarm);
     const newArray = [newAlarm, ...alarms];
     setAlarms(newArray);
     saveAlarmToStorage(newArray);

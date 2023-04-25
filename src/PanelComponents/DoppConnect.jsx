@@ -71,7 +71,6 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
         message: "çocuk kalbimin kayıtlı sesi",
       };
       await Share.open(options);
-      console.log("Sound shared successfully");
     } catch (error) {
       console.log("Error sharing sound:", error.message);
     }
@@ -79,7 +78,6 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
   // ----------------------- start recording sound ---------------------->
   async function startRecording() {
     try {
-      console.log("Requesting permissions.....");
       setStandbyMode(false);
       await Audio.requestPermissionsAsync();
       await Audio.setAudioModeAsync({
@@ -95,7 +93,6 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
       setRecording(recording);
       setIsFinishedRec(false);
       setIsRecording(true);
-      console.log("Recording: ", recording);
     } catch (error) {
       console.log(error);
     }
@@ -103,7 +100,6 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
   // ----------------------- stop recording sound ---------------------->
   async function stopRecording() {
     try {
-      console.log("in stop recording");
       await recording.stopAndUnloadAsync();
       setIsRecording(false);
       if (heartBeat.length > 0) {
@@ -124,7 +120,6 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
           average: average,
           duration: recordingTime,
         };
-        console.log("in stop recording sound object : ", mySoundObj);
         setSoundObject(mySoundObj);
         setIsVisibleModal(true);
         setStandbyMode(true);
@@ -144,7 +139,6 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
     await soundObject.sound.playAsync();
     const status = await soundObject.sound.getStatusAsync();
     soundObject.sound.setOnPlaybackStatusUpdate((status) => {
-      console.log("my in status :", status.positionMillis);
       setSliderValue(status.positionMillis);
       if (status.didJustFinish) {
         setIsPlaying(false);
@@ -185,7 +179,6 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
   }, []);
 
   useEffect(() => {
-    console.log("in if resived message :", message);
     if (!standbyMode) {
       if (heartBeat.indexOf(message) == -1) {
         if (message != 0 && message !== null)

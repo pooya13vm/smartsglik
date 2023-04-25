@@ -112,7 +112,6 @@ const ReminderList = () => {
       setShowDatePicker(false);
     }
   };
-  console.log(showDatePicker);
 
   const deleteHandler = (id) => {
     PushNotification.cancelLocalNotification(id);

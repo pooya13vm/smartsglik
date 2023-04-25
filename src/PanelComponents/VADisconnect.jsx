@@ -23,7 +23,11 @@ const VADisconnect = () => {
           <VA width={(width * 80) / 100} />
         </View>
       </CarouselContainer>
-      <LinkGroup />
+      <LinkGroup
+        url1={
+          "https://www.sush.com.tr/wp-content/uploads/2023/02/Smart-Vucut-Analizi-Kullanim-Kilavuzu.pdf"
+        }
+      />
     </PanelContentContainer>
   );
 };

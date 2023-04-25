@@ -4,7 +4,6 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { colors } from "../assets/utility/colors";
 
 const LinkGroup = ({ url1, url2 }) => {
-  console.log("url in liked group:", url1);
   return (
     <View style={{ alignItems: "center", justifyContent: "center" }}>
       <View

@@ -44,7 +44,6 @@ export const HistoryFetal = () => {
       myArray.unshift(item.average);
     });
     setData(myArray);
-    console.log("average array:", myArray);
     let XArray = [];
     dopDataArray.map((item) => {
       XArray.unshift(item?.date.toString().slice(8, 10));

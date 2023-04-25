@@ -53,7 +53,11 @@ const EKGDisconnect = () => {
           }}
         />
       </CarouselContainer>
-      <LinkGroup />
+      <LinkGroup
+        url1={
+          "https://www.sush.com.tr/wp-content/uploads/2023/02/Smart-Mobil-EKG-Kullanim-Kilavuzu.pdf"
+        }
+      />
     </PanelContentContainer>
   );
 };

@@ -19,7 +19,6 @@ const DoppDisconnect = () => {
   const { heartBeat, setHeartBeat, saveSoundToStorage } =
     useContext(AppContext);
   const width = Dimensions.get("window").width;
-  console.log(heartBeat);
   const carouselData = [
     {
       id: 1,

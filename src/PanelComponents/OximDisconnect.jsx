@@ -14,7 +14,11 @@ const OximDisconnect = () => {
       <CarouselContainer>
         <Oxi width={(width * 70) / 100} />
       </CarouselContainer>
-      <LinkGroup />
+      <LinkGroup
+        url1={
+          "https://www.sush.com.tr/wp-content/uploads/2023/02/Smart-Yuzuk-Oksimetre-Kullanim-Kilavuzu.pdf"
+        }
+      />
     </PanelContentContainer>
   );
 };
