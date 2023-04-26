@@ -52,7 +52,7 @@ const ChooseDeviceModal = ({
                 fontWeight: "500",
               }}
             >
-              Oksimetre
+              Yüzük Oksimetre
             </Text>
           </TouchableOpacity>
         </View>
@@ -114,7 +114,7 @@ const ChooseDeviceModal = ({
                 fontWeight: "500",
               }}
             >
-              EKG
+              Mobil EKG
             </Text>
           </TouchableOpacity>
         </View>

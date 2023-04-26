@@ -69,10 +69,23 @@ function SplashScreen({ navigation }) {
           style={{ width: 50, height: 50, marginRight: 20 }}
         />
         <Text
-          style={{ fontSize: 28, fontWeight: "700", color: colors.darkBlue }}
+          style={{
+            fontSize: 28,
+            fontWeight: "700",
+            color: colors.darkBlue,
+          }}
         >
           Smart Sağlık
         </Text>
+        <View style={{ marginBottom: 12 }}>
+          <Text
+            style={{
+              fontSize: 18,
+            }}
+          >
+            ®
+          </Text>
+        </View>
       </View>
 
       <Svg

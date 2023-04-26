@@ -1,9 +1,10 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import { TitleText } from "../components/TitleText";
 
 export const HistoryEKG = () => {
   return (
     <View>
-      <Text>HistoryEKG</Text>
+      <TitleText children={"Herhangi Bir Veri Yok"} />
     </View>
   );
 };

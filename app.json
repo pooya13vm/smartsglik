@@ -3,6 +3,11 @@
     "name": "smartSaglik",
     "slug": "smartSaglik",
     "version": "1.0.0",
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": ["**/*"],
+    "extra": {
+      "eas": {
+        "projectId": "4d82bf5e-df92-435e-8577-f8004c24bbee"
+      }
+    }
   }
 }
