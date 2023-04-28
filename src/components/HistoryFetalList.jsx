@@ -33,7 +33,7 @@ const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
                 shadowOpacity: 0.3,
                 shadowRadius: 4.65,
                 elevation: 8,
-                width: "96%",
+                width: "98%",
                 alignSelf: "center",
                 height: 70,
                 borderRadius: 20,
@@ -48,7 +48,12 @@ const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
                   size={32}
                   color={colors.text}
                 />
-                <View style={{ marginLeft: 5 }}>
+                <View
+                  style={{
+                    marginLeft: 5,
+                    marginHorizontal: 5,
+                  }}
+                >
                   <View style={{ flexDirection: "row" }}>
                     <Text
                       style={{
@@ -64,7 +69,7 @@ const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
                         fontSize: 15,
                         color: colors.text,
                         fontWeight: "500",
-                        marginLeft: 20,
+                        marginLeft: 10,
                       }}
                     >
                       {item.date.toString().slice(11, 16)}
@@ -87,7 +92,7 @@ const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
                 <View style={{ marginLeft: 8 }}>
                   <Text
                     style={{
-                      fontSize: 15,
+                      fontSize: 14,
                       color: colors.text,
                       fontWeight: "500",
                     }}

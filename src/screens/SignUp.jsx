@@ -1,12 +1,14 @@
 import { useState, useReducer, useContext } from "react";
 import {
   View,
+  Text,
   useWindowDimensions,
   BackHandler,
   ScrollView,
   Keyboard,
 } from "react-native";
 // import firebase from "../database/firebase";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { FormScreenBg } from "../components/FormScreenBg";
 import { TitleText } from "../components/TitleText";
 import { Input } from "../components/Input";
@@ -40,7 +42,8 @@ const ModalTitle = styled.Text`
   font-weight: 500;
 `;
 const ModalLinkPartContainer = styled.View`
-  margin-top: 40%;
+  margin-top: 30%;
+  ${"" /* margin-top: ${(prop) => (prop.height * 10) / 100}px; */};
 `;
 const ModalLinkPartTitle = styled.Text`
   font-size: 16px;
@@ -86,6 +89,7 @@ function SignUp({ navigation }) {
   const [selectedSex, setSelectedSex] = useState("");
   const [warningModalVisibility, setWarningModalVisibility] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
+  const [emailError, setEmailError] = useState(false);
 
   const INITIAL_STATE = {
     name: "",
@@ -163,6 +167,7 @@ function SignUp({ navigation }) {
   const emailValidate = (email) => {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     if (reg.test(email) === false) {
+      setEmailError(true);
       return false;
     } else {
       return true;
@@ -191,147 +196,177 @@ function SignUp({ navigation }) {
   };
 
   return (
-    <FormScreenBg>
-      <View style={{ marginTop: (height * 2) / 100 }}>
-        <TitleText>Kullanıcı Bilgileri</TitleText>
-      </View>
-      <ScrollView
-        style={{
-          marginVertical: (height * 2) / 100,
-          maxHeight: (height * 60) / 100,
-        }}
-      >
-        <Input
-          placeholder="Isim ve Soyisim*"
-          iconName="user"
-          onChangeFun={(val) => dispatch({ type: "ADD_NAME", payload: val })}
-        />
-        <Input
-          placeholder={birthDay ? birthDay : "Doğum Günü"}
-          iconName="calendar"
-          onFocus={() => setShowDatePicker(true)}
-        />
-        {showDatePicker && (
-          <RNDateTimePicker
-            value={new Date()}
-            onChange={datePickerHandler}
-            themeVariant="light"
-          />
-        )}
-        <Input
-          placeholder={sex ? sex : "Cinsiyet"}
-          iconName="intersex"
-          onFocus={() => {
-            if (Keyboard.isVisible()) Keyboard.dismiss();
-            setButtonModalVisibility(true);
+    <KeyboardAwareScrollView>
+      <FormScreenBg>
+        <View style={{ marginTop: (height * 2) / 100 }}>
+          <TitleText>Kullanıcı Bilgileri</TitleText>
+        </View>
+
+        <ScrollView
+          style={{
+            marginVertical: (height * 2) / 100,
+            maxHeight: (height * 60) / 100,
           }}
-        />
-        <Input
-          placeholder="Boy (cm)"
-          iconName="arrows-v"
-          onChangeFun={(val) => dispatch({ type: "ADD_HEIGHT", payload: val })}
-          keyboard="numeric"
-        />
-        <Input
-          placeholder="Ağırlık (kg)"
-          iconName="weight-hanging"
-          isWeight={true}
-          keyboard="numeric"
-          onChangeFun={(val) => dispatch({ type: "ADD_WEIGHT", payload: val })}
-        />
-        <Input
-          placeholder="Email*"
-          iconName="envelope"
-          onChangeFun={(val) => dispatch({ type: "ADD_EMAIL", payload: val })}
-          keyboard="email-address"
-        />
-        <Input
-          placeholder="Şifre*"
-          iconName="lock"
-          onChangeFun={(val) => dispatch({ type: "ADD_PASS", payload: val })}
-          keyboard="visible-password"
-        />
-      </ScrollView>
-      <View
-        style={{
-          width: (width * 75) / 100,
-          alignSelf: "center",
-        }}
-      >
-        <LinkTextContainer>
-          <LinkedText
-            url="https://www.sush.com.tr/gizlilik-politikasi"
-            text="Gizlilik Politikası Ve Red Beyannamesi*"
+        >
+          <Input
+            placeholder="Isim ve Soyisim*"
+            iconName="user"
+            onChangeFun={(val) => dispatch({ type: "ADD_NAME", payload: val })}
           />
-          <Checkbox
-            value={isChecked1}
-            onValueChange={setChecked1}
-            color={colors.text}
+          <Input
+            placeholder={birthDay ? birthDay : "Doğum Günü*"}
+            iconName="calendar"
+            onFocus={() => setShowDatePicker(true)}
           />
-        </LinkTextContainer>
-        <LinkTextContainer>
-          <LinkedText
-            url="https://www.sush.com.tr/k-v-k-k-hakkinda-aydinlatma-metni"
-            text="K.V.K.K. Aydınlatma Metni*"
+          {showDatePicker && (
+            <RNDateTimePicker
+              value={new Date()}
+              onChange={datePickerHandler}
+              themeVariant="light"
+            />
+          )}
+          <Input
+            placeholder={sex ? sex : "Cinsiyet*"}
+            iconName="intersex"
+            onFocus={() => {
+              if (Keyboard.isVisible()) Keyboard.dismiss();
+              setButtonModalVisibility(true);
+            }}
           />
-          <Checkbox
-            value={isChecked2}
-            onValueChange={setChecked2}
-            color={colors.text}
+          <Input
+            placeholder="Boy* (cm)"
+            iconName="arrows-v"
+            onChangeFun={(val) =>
+              dispatch({ type: "ADD_HEIGHT", payload: val })
+            }
+            keyboard="numeric"
           />
-        </LinkTextContainer>
-      </View>
-      <ButtonContainer>
-        <SubmitBtn
-          title="Kayıt Ol"
-          onPressFun={() => {
-            RegisterUserHandler();
+          <Input
+            placeholder="Ağırlık* (kg)"
+            iconName="weight-hanging"
+            isWeight={true}
+            keyboard="numeric"
+            onChangeFun={(val) =>
+              dispatch({ type: "ADD_WEIGHT", payload: val })
+            }
+          />
+          <View style={{ alignItems: "center", position: "relative" }}>
+            <Input
+              placeholder="Email*"
+              iconName="envelope"
+              onChangeFun={(val) =>
+                dispatch({ type: "ADD_EMAIL", payload: val })
+              }
+              keyboard="email-address"
+            />
+            {emailError && (
+              <View style={{ display: "flex", flexDirection: "row" }}>
+                <Text style={{ color: "red", marginRight: 8 }}>
+                  lütfen geçerli eposta adresini giriniz
+                </Text>
+                <View
+                  style={{
+                    borderTopWidth: 2,
+                    borderLeftWidth: 2,
+                    borderColor: "red",
+                    width: 10,
+                    height: 10,
+                    transform: [{ rotate: "45deg" }],
+                  }}
+                ></View>
+              </View>
+            )}
+          </View>
+
+          <Input
+            placeholder="Şifre*"
+            iconName="lock"
+            onChangeFun={(val) => dispatch({ type: "ADD_PASS", payload: val })}
+            keyboard="visible-password"
+          />
+        </ScrollView>
+        <View
+          style={{
+            width: (width * 75) / 100,
+            alignSelf: "center",
           }}
-        />
-      </ButtonContainer>
-      {/* <ButtonContainer onPress={() => navigation.navigate("SignIn")}>
+        >
+          <LinkTextContainer>
+            <LinkedText
+              url="https://www.sush.com.tr/gizlilik-politikasi"
+              text="Gizlilik Politikası Ve Red Beyannamesi*"
+            />
+            <Checkbox
+              value={isChecked1}
+              onValueChange={setChecked1}
+              color={colors.text}
+            />
+          </LinkTextContainer>
+          <LinkTextContainer>
+            <LinkedText
+              url="https://www.sush.com.tr/k-v-k-k-hakkinda-aydinlatma-metni"
+              text="K.V.K.K. Aydınlatma Metni*"
+            />
+            <Checkbox
+              value={isChecked2}
+              onValueChange={setChecked2}
+              color={colors.text}
+            />
+          </LinkTextContainer>
+        </View>
+        <ButtonContainer>
+          <SubmitBtn
+            title="Kayıt Ol"
+            onPressFun={() => {
+              RegisterUserHandler();
+            }}
+          />
+        </ButtonContainer>
+        {/* <ButtonContainer onPress={() => navigation.navigate("SignIn")}>
         <SendToSigInText>Hesabın Var Mı ?</SendToSigInText>
       </ButtonContainer> */}
-      {/* ----------------first modal---------- */}
-      <ModalContainer heightPercentage={53} isModalVisible={isModalVisible}>
-        <ModalTitle>
-          * Smart Sağlık Marka Cihazlar İle Mobil Uygulamayı Kullanabilirsiniz.
-        </ModalTitle>
-        <ModalTitle>
-          * Kişisel verileriniz sadece cihazınızda kalmaktadır.
-        </ModalTitle>
-        <ModalTitle>
-          * Uygulamayı silmeniz durumunda verileriniz kalıcı olarak
-          silinecektir.
-        </ModalTitle>
-        <ModalLinkPartContainer>
-          <ModalLinkPartTitle>Satın Almak Için:</ModalLinkPartTitle>
-          <LinkedText
-            text="www.sush.com.tr"
-            url="https://www.sush.com.tr/magaza"
-          />
-        </ModalLinkPartContainer>
-        <ModalButtonContainer>
-          <ModalOutlineButton onPress={() => BackHandler.exitApp()}>
-            <ModalOutlineButtonText>Iptal</ModalOutlineButtonText>
-          </ModalOutlineButton>
-          <ModalFilledButton onPress={() => setModalVisible(false)}>
-            <ModalFilledButtonText>Tamam</ModalFilledButtonText>
-          </ModalFilledButton>
-        </ModalButtonContainer>
-      </ModalContainer>
-      {/* ---------- button modal for choosing gender ------------- */}
-      <ButtonModal
-        isVisible={buttonModalVisibility}
-        setSelectedSex={setSelectedSex}
-        sexModalCloseHandler={sexModalCloseHandler}
-      />
-      <WarningModal
-        visibility={warningModalVisibility}
-        setVisibility={setWarningModalVisibility}
-        message={warningMessage}
-      />
-    </FormScreenBg>
+        {/* ----------------first modal---------- */}
+        <ModalContainer heightPercentage={53} isModalVisible={isModalVisible}>
+          <ModalTitle>
+            * Smart Sağlık Marka Cihazlar İle Mobil Uygulamayı
+            Kullanabilirsiniz.
+          </ModalTitle>
+          <ModalTitle>
+            * Kişisel verileriniz sadece cihazınızda kalmaktadır.
+          </ModalTitle>
+          <ModalTitle>
+            * Uygulamayı silmeniz durumunda verileriniz kalıcı olarak
+            silinecektir.
+          </ModalTitle>
+          <ModalLinkPartContainer>
+            <ModalLinkPartTitle>Satın Almak Için:</ModalLinkPartTitle>
+            <LinkedText
+              text="www.sush.com.tr"
+              url="https://www.sush.com.tr/magaza"
+            />
+          </ModalLinkPartContainer>
+          <ModalButtonContainer>
+            <ModalOutlineButton onPress={() => BackHandler.exitApp()}>
+              <ModalOutlineButtonText>Iptal</ModalOutlineButtonText>
+            </ModalOutlineButton>
+            <ModalFilledButton onPress={() => setModalVisible(false)}>
+              <ModalFilledButtonText>Tamam</ModalFilledButtonText>
+            </ModalFilledButton>
+          </ModalButtonContainer>
+        </ModalContainer>
+        {/* ---------- button modal for choosing gender ------------- */}
+        <ButtonModal
+          isVisible={buttonModalVisibility}
+          setSelectedSex={setSelectedSex}
+          sexModalCloseHandler={sexModalCloseHandler}
+        />
+        <WarningModal
+          visibility={warningModalVisibility}
+          setVisibility={setWarningModalVisibility}
+          message={warningMessage}
+        />
+      </FormScreenBg>
+    </KeyboardAwareScrollView>
   );
 }
 

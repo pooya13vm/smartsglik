@@ -9,7 +9,6 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState([]);
   const [userUpdated, setUserUpdated] = useState(false);
   const [alarms, setAlarms] = useState([]);
-  const [isConnected, setConnected] = useState(false);
   const [heartBeat, setHeartBeat] = useState([]);
 
   const checkStorage = async () => {

@@ -10,6 +10,7 @@ export const Input = ({
   onFocus,
   isWeight = false,
   keyboard = "default",
+  placeholderColor = colors.midBlue,
 }) => {
   const { height, width } = useWindowDimensions();
   return (
@@ -26,7 +27,14 @@ export const Input = ({
         marginVertical: 10,
       }}
     >
-      <View style={{ width: 50, alignItems: "center" }}>
+      <View
+        style={{
+          width: 50,
+          alignItems: "center",
+          borderRightWidth: 2,
+          borderRightColor: colors.text,
+        }}
+      >
         {!isWeight ? (
           <FontAwesome
             name={iconName}
@@ -60,6 +68,7 @@ export const Input = ({
         placeholder={placeholder}
         onFocus={onFocus}
         keyboardType={keyboard}
+        placeholderTextColor={placeholderColor}
       />
     </View>
   );

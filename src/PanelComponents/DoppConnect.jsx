@@ -269,7 +269,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
             {isFinishedRec && (
               <View
                 style={{
-                  height: 185,
+                  height: 160,
                   justifyContent: "space-between",
                   borderWidth: 2,
                   borderRadius: 15,
@@ -367,7 +367,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
             flexDirection: "row",
             paddingHorizontal: 15,
             justifyContent: "space-between",
-            marginTop: "30%",
+            marginTop: "20%",
           }}
         >
           <TouchableOpacity

@@ -1,12 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import {
-  View,
-  useWindowDimensions,
-  LogBox,
-  Alert,
-  TouchableOpacity,
-  Text,
-} from "react-native";
+import { View, LogBox, Alert, TouchableOpacity, Text } from "react-native";
 import { AppContext } from "../context/mainContext";
 import Lottie from "lottie-react-native";
 import { BleManager } from "react-native-ble-plx";
@@ -16,6 +9,11 @@ LogBox.ignoreLogs(["new NativeEventEmitter"]);
 LogBox.ignoreAllLogs();
 
 // customize components import
+import {
+  base64ToDecimal,
+  receiveUUIDhandler,
+  serviceUUIDhandler,
+} from "../assets/utility/bluetoothConnection";
 import ChooseDeviceModal from "../components/ChooseDeviceModal";
 import ScreenLayout from "../components/ScreenLayout";
 import { Header } from "../components/Header";
@@ -35,13 +33,7 @@ import { colors } from "../assets/utility/colors";
 import { macAddressChecker } from "../assets/utility/macAddress";
 import { MainScreensContainer } from "../styles";
 
-const SEND_SERVICE_UUID = "0000FFE5-0000-1000-8000-00805F9B34FB";
-const BOX_UUID = "0000FFE9-0000-1000-8000-00805F9B34FB";
-const RECEIVE_SERVICE_UUID = "0000FFE0-0000-1000-8000-00805F9B34FB";
-const MESSAGE_UUID = "0000FFE4-0000-1000-8000-00805F9B34FB";
-
 const Panel = (props) => {
-  const { width, height } = useWindowDimensions();
   const { device, setDevice, saveDeviceToStorage } = useContext(AppContext);
   //--------------- states --------------------
   const [isScanning, setScanning] = useState(false);
@@ -71,13 +63,15 @@ const Panel = (props) => {
     }
   };
   //----------------------scanning --------------------------
+
   const scanDevices = async () => {
     BLTManager.startDeviceScan(null, null, (error, scannedDevice) => {
       if (error) {
         console.warn(error);
       }
       if (scannedDevice) {
-        if (scannedDevice.name == "VTM AD5") {
+        console.log(scanDevices);
+        if (scannedDevice.name == "VTM AD5" && device == "Fetal Doppler") {
           BLTManager.stopDeviceScan();
           if (macAddressChecker(scannedDevice.id)) {
             connectDevice(scannedDevice);
@@ -86,6 +80,12 @@ const Panel = (props) => {
           } else {
             Alert.alert("Cihazınız firmamıza ait değildir.");
           }
+        }
+        if (scannedDevice.name == "O2Ring 0217" && device == "Oksimetre") {
+          BLTManager.stopDeviceScan();
+          connectDevice(scannedDevice);
+          setScanning(false);
+          setBluetoothModal(false);
         }
       }
     });
@@ -111,25 +111,50 @@ const Panel = (props) => {
           setConnected(false);
         });
         //sending pass frequently
-        // setTimeout(() => {
-        sendPassword(device).then(() => {
-          console.warn("message sended");
-        });
-        // }, 2000);
+        console.log(device.name);
+        if (device.name == "VTM AD5") {
+          setTimeout(() => {
+            sendPasswordForDob(device).then(() => {
+              console.warn("message sended");
+            });
+          }, 1000);
+        }
+        if (device.name == "O2Ring 0217") {
+          setTimeout(() => {
+            sendPasswordForOxi(device).then(() => {
+              console.warn("message sended");
+            });
+          }, 2000);
+        }
         //reading result
+
         device.monitorCharacteristicForService(
-          RECEIVE_SERVICE_UUID,
-          MESSAGE_UUID,
+          serviceUUIDhandler(device.name),
+          receiveUUIDhandler(device.name),
           (error, characteristic) => {
             if (error) {
               console.log(`Error monitoring characteristic: ${error}`);
               return;
             } else {
-              let message = base64
-                .decode(characteristic.value)
-                .replace(/\s\s+/g, " ")
-                .charCodeAt(11);
-              setMessage(message);
+              if (device.name === "VTM AD5") {
+                let message = base64
+                  .decode(characteristic.value)
+                  .replace(/\s\s+/g, " ")
+                  .charCodeAt(11);
+                setMessage(message);
+                console.log(
+                  base64
+                    .decode(characteristic.value)
+                    .replace(/\s\s+/g, " ")
+                    .charCodeAt(11)
+                );
+              }
+              // in if ra k ezafe mikonam dop kar nemokonad
+              // if (device.name == "O2Ring 0217") {
+              //   let message = base64ToDecimal(characteristic.value);
+              //   console.log(message);
+              //   setMessage(message);
+              // }
             }
           }
         );
@@ -154,22 +179,40 @@ const Panel = (props) => {
       }
     }
   }
+
   //-----------------send value to device function -----------------------
-  const sendPassword = async (device) => {
+  const sendPasswordForDob = async (device) => {
     const byteArray = new Uint8Array([
       0xff, 0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc,
     ]);
-
+    console.log("sending ....");
     BLTManager.writeCharacteristicWithResponseForDevice(
       device.id,
-      SEND_SERVICE_UUID,
-      BOX_UUID,
+      "0000FFE5-0000-1000-8000-00805F9B34FB",
+      "0000FFE9-0000-1000-8000-00805F9B34FB",
       base64.encodeFromByteArray(byteArray)
     )
       .then(() => {
         console.log("data sended successfully");
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log("the error is:", e));
+  };
+  const sendPasswordForOxi = async (device) => {
+    const byteArray = new Uint8Array([
+      0xaa, 0x17, 0xe8, 0x00, 0x00, 0x00, 0x00, 0x1b,
+    ]);
+    setInterval(() => {
+      BLTManager.writeCharacteristicWithResponseForDevice(
+        device.id,
+        "14839ac4-7d7e-415c-9a42-167340cf2339",
+        "8b00ace7-eb0b-49b0-bbe9-9aee0a26e1a3",
+        base64.encodeFromByteArray(byteArray)
+      )
+        .then(() => {
+          console.log("data sended successfully");
+        })
+        .catch((e) => console.log(e));
+    }, 10000);
   };
   return (
     //-----------------------jsx body -------------------------
