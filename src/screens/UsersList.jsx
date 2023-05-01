@@ -237,7 +237,7 @@ const UsersList = ({ navigation }) => {
             <Text
               style={{ fontSize: 24, marginBottom: 10, color: colors.text }}
             >
-              Ayrılık :
+              Ağırlık :
             </Text>
             <TextInput
               style={{

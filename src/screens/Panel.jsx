@@ -4,6 +4,7 @@ import { AppContext } from "../context/mainContext";
 import Lottie from "lottie-react-native";
 import { BleManager } from "react-native-ble-plx";
 import base64 from "react-native-base64";
+import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 const BLTManager = new BleManager();
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
 LogBox.ignoreAllLogs();
@@ -25,7 +26,7 @@ import OximConnect from "../PanelComponents/OximConnect";
 import OximDisconnect from "../PanelComponents/OximDisconnect";
 import VAConnect from "../PanelComponents/VAConnect";
 import VADisconnect from "../PanelComponents/VADisconnect";
-import { getPermission } from "../assets/utility/getAndroidPermission";
+// import { getPermission } from "../assets/utility/getAndroidPermission";
 import ModalContainer from "../components/ModalContainer";
 import { SubmitBtn } from "../components/SubmitBtn";
 import { TitleText } from "../components/TitleText";
@@ -44,15 +45,21 @@ const Panel = (props) => {
   const [message, setMessage] = useState(0);
 
   useEffect(() => {
-    if (!device) setShowDevicesModal(true);
-    getPermission().then((result) => {
-      if (!result) Alert.alert("Lütfen uygulamaya gerekli izinleri verin");
+    requestMultiple([
+      PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
+      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+      PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE,
+      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+      PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
+    ]).then((statuses) => {
+      console.log("ok");
     });
     BLTManager.state().then((val) => {
       if (val !== "PoweredOn") {
         BLTManager.enable().then(() => console.log("bluetooth is turned on"));
       }
     });
+    if (!device) setShowDevicesModal(true);
   }, []);
   //-----------------start connecting -------------------
   const connectingToDevice = () => {

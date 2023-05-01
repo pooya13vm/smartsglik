@@ -42,7 +42,7 @@ const ModalTitle = styled.Text`
   font-weight: 500;
 `;
 const ModalLinkPartContainer = styled.View`
-  margin-top: 30%;
+  margin-top: 18%;
   ${"" /* margin-top: ${(prop) => (prop.height * 10) / 100}px; */};
 `;
 const ModalLinkPartTitle = styled.Text`

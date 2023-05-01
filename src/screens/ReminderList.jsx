@@ -8,7 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { AppContext } from "../context/mainContext";
-import RNDateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ScreenLayout from "../components/ScreenLayout";
 import { TitleText } from "../components/TitleText";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -20,18 +20,28 @@ import AddBtn from "../components/AddBtn";
 import ModalContainer from "../components/ModalContainer";
 import { SubmitBtn } from "../components/SubmitBtn";
 import PushNotification, { Importance } from "react-native-push-notification";
+import { request } from "react-native-permissions";
+import { makeTurkishDate } from "../assets/utility/makeTurkishDate";
 
 const ReminderList = () => {
   const { width, height } = useWindowDimensions();
   const { alarms, saveNewAlarm, deleteAlarmHandler } = useContext(AppContext);
-
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [time, setTime] = useState();
   const [alarmMessage, setAlarmMessage] = useState("");
-  const [timeObj, setTimeObj] = useState({ hour: 0, min: 0 });
+  const [timeObj, setTimeObj] = useState({ time: "", mil: 0 });
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
+    const requestNotificationPermission = async () => {
+      try {
+        const result = await request("notification");
+      } catch (error) {
+        console.warn("Error requesting notification permission:", error);
+      }
+    };
+    requestNotificationPermission();
     PushNotification.checkPermissions((res) => {
       if (!res.alert) {
         Alert.alert(
@@ -75,19 +85,19 @@ const ReminderList = () => {
       channelId: "alarm-channel",
       title: "Smart Sağlık",
       message: alarmMessage ? alarmMessage : "Tanımsız",
-      bigText: `${timeObj.hour} : ${timeObj.min}`,
+      bigText: `${makeTurkishDate(timeObj.time)}`,
       date: time,
       invokeApp: true,
       allowWhileIdle: true,
       playSound: true,
       importance: Importance.HIGH,
       soundName: "sound1",
-      repeatType: "day",
+      // repeatType: "time",
       color: colors.lightBlue,
       id: UNId,
       vibration: true,
       ignoreInForeground: false,
-      repeatTime: 100,
+      // repeatTime: 1,
     });
     const alarmObj = {
       id: UNId,
@@ -96,21 +106,15 @@ const ReminderList = () => {
     };
     saveNewAlarm(alarmObj);
     setShowAddModal(false);
-    setTimeObj({ hour: 0, min: 0 });
+    setTimeObj({ time: "", mil: 0 });
     setShowDatePicker(false);
   };
 
-  const datePickerHandler = (event, time) => {
-    if (event.type === "set") {
-      setTime(time);
-      const hour = time.getHours();
-      const min = time.getMinutes();
-      setTimeObj({ hour, min });
-      setShowDatePicker(false);
-      setShowAddModal(true);
-    } else {
-      setShowDatePicker(false);
-    }
+  const datePickerHandler = (selectedTime) => {
+    setShowDatePicker(Platform.OS === "ios");
+    setTime(selectedTime);
+    setTimeObj({ time: selectedTime.toString(), mil: selectedTime.getTime() });
+    setShowAddModal(true);
   };
 
   const deleteHandler = (id) => {
@@ -157,15 +161,19 @@ const ReminderList = () => {
                       </View>
                       <View style={{ width: "10%" }}>
                         <FontAwesome5
-                          name="bell"
+                          name={
+                            item.time.mil > currentTime.getTime()
+                              ? "bell"
+                              : "bell-slash"
+                          }
                           size={22}
                           color={colors.text}
                         />
                       </View>
 
                       <View style={{ width: "25%", alignItems: "center" }}>
-                        <DescriptionText size={18}>
-                          {item.time.hour} : {item.time.min}
+                        <DescriptionText size={16}>
+                          {makeTurkishDate(item.time.time)}
                         </DescriptionText>
                       </View>
                     </>
@@ -183,26 +191,27 @@ const ReminderList = () => {
         />
         <AddBtn icon="plus" onPress={() => setShowDatePicker(true)} />
       </View>
-      {showDatePicker && (
-        <RNDateTimePicker
-          mode="time"
-          value={new Date()}
-          onChange={datePickerHandler}
-          themeVariant="light"
-        />
-      )}
+      <DateTimePickerModal
+        isVisible={showDatePicker}
+        mode="datetime"
+        date={currentTime}
+        onConfirm={datePickerHandler}
+        onCancel={() => setShowDatePicker(false)}
+        locale="tr"
+      />
       <ModalContainer heightPercentage={50} isModalVisible={showAddModal}>
         <View
           style={{
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
+            marginTop: 20,
           }}
         >
           <View style={{ marginRight: 10 }}>
             <FontAwesome5 name="bell" size={24} color={colors.text} />
           </View>
-          <TitleText children={`${time?.getHours()} : ${time?.getMinutes()}`} />
+          <TitleText children={`${makeTurkishDate(timeObj.time)}`} size={16} />
         </View>
 
         <TextInput
@@ -211,7 +220,7 @@ const ReminderList = () => {
           maxLength={22}
           style={{
             marginHorizontal: 30,
-            marginVertical: 60,
+            marginVertical: 70,
             fontSize: 18,
             color: colors.text,
             fontWeight: "600",

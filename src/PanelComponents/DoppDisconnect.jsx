@@ -66,7 +66,8 @@ const DoppDisconnect = () => {
       <TitleText children={"Fetal Doppler"} size={24} />
       <CarouselContainer>
         <Carousel
-          loop
+          loop={true}
+          autoPlayInterval={true}
           data={carouselData}
           style={{ alignSelf: "center" }}
           width={(width * 90) / 100}
@@ -102,14 +103,14 @@ const DoppDisconnect = () => {
           children={
             "Kaydetmek İstiyor musun ? Cevabınız ' Evet ' ise geçmiş kayıtlarda görünecek, Cevabınız ' Hayır ' ise bu kayıt silinecek."
           }
-          size={21}
+          size={19}
         />
         <View
           style={{
             flexDirection: "row",
             paddingHorizontal: 15,
             justifyContent: "space-between",
-            marginTop: "30%",
+            marginTop: "15%",
           }}
         >
           <TouchableOpacity

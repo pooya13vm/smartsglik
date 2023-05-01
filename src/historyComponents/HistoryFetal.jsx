@@ -77,7 +77,7 @@ export const HistoryFetal = () => {
                 formatLabel={(value) => `${value}`}
               />
               <LineChart
-                style={{ height: 270, width: "86%", marginLeft: 32 }}
+                style={{ height: "100%", width: "86%", marginLeft: 32 }}
                 gridMin={70}
                 gridMax={200}
                 data={data}
@@ -114,7 +114,7 @@ export const HistoryFetal = () => {
           </ChartContainer>
         </BlockContainer>
       ) : (
-        <TitleText children={"Listede öğe yok"} />
+        <TitleText children={"Kayıt Bulunamadı"} />
       )}
       {!selectedItem ? (
         <HistoryFetalList

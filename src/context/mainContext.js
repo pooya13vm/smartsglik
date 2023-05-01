@@ -15,7 +15,7 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@User");
       const parsST = JSON.parse(getST);
-      if (parsST.length > 0) {
+      if (parsST?.length > 0) {
         setUser(parsST);
         setRegister(true);
       }
@@ -34,7 +34,7 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Sound");
       const parsST = JSON.parse(getST);
-      if (parsST.length > 0) {
+      if (parsST?.length > 0) {
         setDopDataArray(parsST);
       }
     } catch (error) {
@@ -43,7 +43,7 @@ export const AppProvider = ({ children }) => {
     try {
       const getST = await AsyncStorage.getItem("@Alarms");
       const parsST = JSON.parse(getST);
-      if (parsST.length > 0) {
+      if (parsST?.length > 0) {
         setAlarms(parsST);
       }
     } catch (error) {
@@ -53,6 +53,7 @@ export const AppProvider = ({ children }) => {
   // AsyncStorage.clear();
 
   const saveNewUser = (userObject) => {
+    console.log("new user:", userObject);
     userObject.status = "active";
     let userCopy = [...user];
     userCopy.map((item, index) => {
