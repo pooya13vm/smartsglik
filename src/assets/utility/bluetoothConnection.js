@@ -55,3 +55,18 @@ export const receiveUUIDhandler = (device) => {
   if (device === "O2Ring 0217") return "0734594a-a8e7-4b1a-a6b1-cd5243059a57";
   if (device === "EKG") return "0734594a-a8e7-4b1a-a6b1-cd5243059a57";
 };
+export function base64ToHex(base64) {
+  // Convert base64 to a byte array
+  const bytes = atob(base64)
+    .split("")
+    .map((char) => char.charCodeAt(0));
+
+  // Convert byte array to hexadecimal string
+  const hex = bytes
+    .map((byte) => {
+      return ("0" + byte.toString(16)).slice(-2);
+    })
+    .join("");
+
+  return hex;
+}

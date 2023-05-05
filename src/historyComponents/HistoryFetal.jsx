@@ -11,10 +11,11 @@ import { AppContext } from "../context/mainContext";
 import HistoryFetalList from "../components/HistoryFetalList";
 import HistoryFetalItem from "../components/HistoryFetalItem";
 import { colors } from "../assets/utility/colors";
-// import * as shape from "d3-shape";
+import * as shape from "d3-shape";
 import Share from "react-native-share";
 import ViewShot, { captureRef } from "react-native-view-shot";
 import { TitleText } from "../components/TitleText";
+import { monthNumberMaker } from "../assets/utility/monthNumber";
 
 export const HistoryFetal = () => {
   // states
@@ -41,14 +42,22 @@ export const HistoryFetal = () => {
   useEffect(() => {
     let myArray = [];
     dopDataArray.map((item) => {
-      myArray.unshift(item.average);
+      if (myArray.length <= 12) {
+        if (+item.average <= 200) {
+          myArray.unshift(+item.average);
+        }
+      }
     });
     setData(myArray);
     let XArray = [];
+
     dopDataArray.map((item) => {
-      XArray.unshift(item?.date.toString().slice(8, 10));
+      const day = item?.date.slice(8, 10);
+      const month = monthNumberMaker(item?.date);
+      XArray.unshift(`${month}/${day}`);
     });
     setXData(XArray);
+    console.log(XData);
   }, [dopDataArray.length]);
 
   return (

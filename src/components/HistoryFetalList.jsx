@@ -1,6 +1,7 @@
 import { FlatList, TouchableOpacity, View, Text } from "react-native";
 import { colors } from "../assets/utility/colors";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { makeTurkishDate } from "../assets/utility/makeTurkishDate";
 
 const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
   function formatTime(milliseconds) {
@@ -62,17 +63,7 @@ const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
                         fontWeight: "500",
                       }}
                     >
-                      {item.date.toString().slice(0, 10)}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        color: colors.text,
-                        fontWeight: "500",
-                        marginLeft: 10,
-                      }}
-                    >
-                      {item.date.toString().slice(11, 16)}
+                      {makeTurkishDate(item.date, false)}
                     </Text>
                   </View>
 
@@ -97,7 +88,7 @@ const HistoryFetalList = ({ dopDataArray, setSelectedItem }) => {
                       fontWeight: "500",
                     }}
                   >
-                    Nabiz
+                    Ort.Nabız
                   </Text>
                   <Text
                     style={{

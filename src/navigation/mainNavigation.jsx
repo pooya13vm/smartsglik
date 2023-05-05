@@ -1,5 +1,7 @@
+import { useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
+import { AppContext } from "../context/mainContext";
 const Stack = createNativeStackNavigator();
 
 import TabsNavigation from "./TabNavigation";
@@ -9,6 +11,7 @@ import SplashScreen from "../screens/splashScreen/SplashScreen";
 import { colors } from "../assets/utility/colors";
 
 function RegisterStackNavigation() {
+  const { isAppLoading } = useContext(AppContext);
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -17,7 +20,9 @@ function RegisterStackNavigation() {
           contentStyle: { backgroundColor: colors.midBlue },
         }}
       >
-        <Stack.Screen name="SplashScreen" component={SplashScreen} />
+        {!isAppLoading && (
+          <Stack.Screen name="SplashScreen" component={SplashScreen} />
+        )}
         <Stack.Screen name="Home" component={TabsNavigation} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="SignIn" component={SignIn} />

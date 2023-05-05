@@ -12,7 +12,7 @@ const OximDisconnect = () => {
       <TitleText children={"Smart"} size={24} />
       <TitleText children={"Yüzük Oksimetre"} size={24} />
       <CarouselContainer>
-        <Oxi width={(width * 70) / 100} />
+        <Oxi width={(width * 70) / 100} height={380} />
       </CarouselContainer>
       <LinkGroup
         url1={

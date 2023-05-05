@@ -10,6 +10,7 @@ export const AppProvider = ({ children }) => {
   const [userUpdated, setUserUpdated] = useState(false);
   const [alarms, setAlarms] = useState([]);
   const [heartBeat, setHeartBeat] = useState([]);
+  const [isAppLoading, setAppLoading] = useState(false);
 
   const checkStorage = async () => {
     try {
@@ -90,6 +91,7 @@ export const AppProvider = ({ children }) => {
   };
 
   const saveSoundToStorage = async (sound) => {
+    console.log("object to save in storage:", sound);
     const copyState = [sound, ...dopDataArray];
     setDopDataArray(copyState);
     try {
@@ -137,6 +139,8 @@ export const AppProvider = ({ children }) => {
       userUpdated,
       alarms,
       heartBeat,
+      isAppLoading,
+      setAppLoading,
       setHeartBeat,
       saveNewAlarm,
       saveDeviceToStorage,
@@ -150,7 +154,16 @@ export const AppProvider = ({ children }) => {
       updateUsers,
       deleteAlarmHandler,
     }),
-    [isRegistered, device, user, dopDataArray, userUpdated, alarms, heartBeat]
+    [
+      isRegistered,
+      device,
+      user,
+      dopDataArray,
+      userUpdated,
+      alarms,
+      heartBeat,
+      isAppLoading,
+    ]
   );
   return <AppContext.Provider value={ctx}>{children}</AppContext.Provider>;
 };

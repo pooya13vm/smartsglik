@@ -51,7 +51,7 @@ const DoppDisconnect = () => {
       sound: null,
       id: uuid.v4(),
       beatArray: heartBeat,
-      date: new Date(),
+      date: new Date().toString(),
       uri: null,
       average: average,
       duration: 0,
@@ -71,7 +71,7 @@ const DoppDisconnect = () => {
           data={carouselData}
           style={{ alignSelf: "center" }}
           width={(width * 90) / 100}
-          height={500}
+          height={350}
           autoPlay={true}
           scrollAnimationDuration={2000}
           renderItem={({ item }) => {

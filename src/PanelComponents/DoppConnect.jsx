@@ -115,7 +115,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
           sound: sound,
           id: uuid.v4(),
           beatArray: heartBeat,
-          date: new Date(),
+          date: new Date().toString(),
           uri: recording.getURI(),
           average: average,
           duration: recordingTime,
@@ -181,7 +181,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
   useEffect(() => {
     if (!standbyMode) {
       if (heartBeat.indexOf(message) == -1) {
-        if (message != 0 && message !== null)
+        if (message != 0 && message !== null && message !== NaN)
           setHeartBeat([...heartBeat, message]);
       }
     }

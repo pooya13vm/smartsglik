@@ -9,6 +9,8 @@ import Share from "react-native-share";
 import * as FileSystem from "expo-file-system";
 import { WarningModal } from "./WarningModal";
 import { AppContext } from "../context/mainContext";
+import { makeTurkishDate } from "../assets/utility/makeTurkishDate";
+import ShareButtonModal from "./ShareButtonModal";
 
 const InsideContainer = styled.View`
   height: 100%;
@@ -51,6 +53,8 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [sound, setSound] = useState();
   const [warningModalV, SetWarningModalV] = useState(false);
+  const [SMVisible, setSMVisible] = useState(false);
+  const [hasSound, setHasSound] = useState(Boolean);
 
   const { dopDataArray, setDopDataArray, saveSoundDeletedToStorage } =
     useContext(AppContext);
@@ -92,6 +96,23 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
       }
     }
   };
+  const shareData = async () => {
+    console.log(item);
+    try {
+      const options = {
+        type: "text",
+        message: `Tarih : ${makeTurkishDate(item.date)}
+Ort : ${item.average}
+Min : ${Math.min.apply(Math, item.beatArray)}
+Maks : ${Math.max.apply(Math, item.beatArray)}
+Nabız Sayısı : ${item.beatArray.join("   ")}
+`,
+      };
+      await Share.open(options);
+    } catch (error) {
+      console.log("Error sharing sound:", error.message);
+    }
+  };
   // ----------------------- delete sound ---------------------->
   async function deleteSoundFile() {
     try {
@@ -113,7 +134,11 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
     const item = dopDataArray.filter((item) => item.id == selectedItem);
     setItem(item[0]);
     setRecordingTime(item[0]?.duration);
-
+    if (item[0].sound) {
+      setHasSound(true);
+    } else {
+      setHasSound(false);
+    }
     async function loadSound() {
       const source = {
         uri: `${item[0].uri}`,
@@ -133,9 +158,9 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
               <AntDesign name="back" size={24} color={colors.text} />
             </AntDesignContainer>
             <FontAwesomeContainer
-              onPress={shareRecording}
-              disabled={!item.sound && true}
-              opacity={!item.sound && true}
+              onPress={() => {
+                setSMVisible(true);
+              }}
             >
               <FontAwesome5 name="share-alt" size={24} color={colors.text} />
             </FontAwesomeContainer>
@@ -167,10 +192,7 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
             )}`}</TitleText>
           </Row>
           <Row>
-            <TitleText>{item.date.toString().slice(0, 10)}</TitleText>
-            <TitleText>{`       ${item.date
-              .toString()
-              .slice(11, 16)}`}</TitleText>
+            <TitleText>{makeTurkishDate(item.date)}</TitleText>
           </Row>
           <Slider
             style={{
@@ -189,9 +211,16 @@ const HistoryFetalItem = ({ selectedItem, setSelectedItem }) => {
       <WarningModal
         visibility={warningModalV}
         setVisibility={SetWarningModalV}
-        message="öğeyi sileceğinizden emin misiniz?"
+        message="Öğeyi silmek istediğinize emin misiniz?"
         result={true}
         resultFunction={deleteSoundFile}
+      />
+      <ShareButtonModal
+        visibility={SMVisible}
+        setVisibility={setSMVisible}
+        sound={hasSound}
+        shareSound={shareRecording}
+        shareData={shareData}
       />
     </>
   );

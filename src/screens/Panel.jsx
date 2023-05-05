@@ -8,10 +8,11 @@ import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 const BLTManager = new BleManager();
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
 LogBox.ignoreAllLogs();
-
+let OxiInterval;
 // customize components import
 import {
-  base64ToDecimal,
+  base64ToHex,
+  // base64ToDecimal,
   receiveUUIDhandler,
   serviceUUIDhandler,
 } from "../assets/utility/bluetoothConnection";
@@ -77,7 +78,6 @@ const Panel = (props) => {
         console.warn(error);
       }
       if (scannedDevice) {
-        console.log(scanDevices);
         if (scannedDevice.name == "VTM AD5" && device == "Fetal Doppler") {
           BLTManager.stopDeviceScan();
           if (macAddressChecker(scannedDevice.id)) {
@@ -116,24 +116,21 @@ const Panel = (props) => {
         // handle disconnect device
         BLTManager.onDeviceDisconnected(device.id, (error, device) => {
           setConnected(false);
+          if (OxiInterval) clearInterval(OxiInterval);
         });
         //sending pass frequently
-        console.log(device.name);
+
         if (device.name == "VTM AD5") {
-          setTimeout(() => {
-            sendPasswordForDob(device).then(() => {
-              console.warn("message sended");
-            });
-          }, 1000);
+          sendPasswordForDob(device).then(() => {
+            console.warn("message sended");
+          });
         }
+        console.log(device.name);
         if (device.name == "O2Ring 0217") {
-          setTimeout(() => {
-            sendPasswordForOxi(device).then(() => {
-              console.warn("message sended");
-            });
-          }, 2000);
+          sendPasswordForOxi(device).then(() => {
+            console.warn("message sended");
+          });
         }
-        //reading result
 
         device.monitorCharacteristicForService(
           serviceUUIDhandler(device.name),
@@ -156,12 +153,16 @@ const Panel = (props) => {
                     .charCodeAt(11)
                 );
               }
-              // in if ra k ezafe mikonam dop kar nemokonad
-              // if (device.name == "O2Ring 0217") {
-              //   let message = base64ToDecimal(characteristic.value);
-              //   console.log(message);
-              //   setMessage(message);
-              // }
+
+              if (device.name == "O2Ring 0217") {
+                let hex = base64ToHex(characteristic.value);
+                // console.log(hex.slice(16, 18));
+                let message = [
+                  parseInt(hex.substring(16, 18), 16),
+                  parseInt(hex.substring(14, 16), 16),
+                ];
+                setMessage(message);
+              }
             }
           }
         );
@@ -208,7 +209,8 @@ const Panel = (props) => {
     const byteArray = new Uint8Array([
       0xaa, 0x17, 0xe8, 0x00, 0x00, 0x00, 0x00, 0x1b,
     ]);
-    setInterval(() => {
+
+    OxiInterval = setInterval(() => {
       BLTManager.writeCharacteristicWithResponseForDevice(
         device.id,
         "14839ac4-7d7e-415c-9a42-167340cf2339",
@@ -219,7 +221,7 @@ const Panel = (props) => {
           console.log("data sended successfully");
         })
         .catch((e) => console.log(e));
-    }, 10000);
+    }, 1000);
   };
   return (
     //-----------------------jsx body -------------------------
@@ -242,7 +244,12 @@ const Panel = (props) => {
           />
         )}
         {!isConnected && device === "Oksimetre" && <OximDisconnect />}
-        {isConnected && device === "Oksimetre" && <OximConnect />}
+        {isConnected && device === "Oksimetre" && (
+          <OximConnect
+            message={message}
+            disconnectBluetooth={disconnectBluetooth}
+          />
+        )}
         {!isConnected && device === "EKG" && <EKGDisconnect />}
         {isConnected && device === "EKG" && <EKGConnect />}
         {!isConnected && device === "Vücut Analizi" && <VADisconnect />}

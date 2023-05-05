@@ -13,7 +13,7 @@ import { AppContext } from "../../context/mainContext";
 
 function SplashScreen({ navigation }) {
   const { height, width } = useWindowDimensions();
-  const { isRegistered, checkStorage } = useContext(AppContext);
+  const { isRegistered, checkStorage, setAppLoading } = useContext(AppContext);
 
   // const navigation = useNavigation();
   useEffect(() => {
@@ -21,6 +21,7 @@ function SplashScreen({ navigation }) {
   }, []);
 
   const handleAppStart = () => {
+    setAppLoading(true);
     if (isRegistered) {
       navigation.navigate("Home");
     } else {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal, View, Text, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { colors } from "../assets/utility/colors";
+import { BottomModalContainer } from "../styles";
 
 export default function ButtonModal({
   isVisible,
@@ -12,17 +13,7 @@ export default function ButtonModal({
   const [femaleIsSelected, setFemaleSelected] = useState(false);
   return (
     <Modal animationType="slide" transparent={true} visible={isVisible}>
-      <View
-        style={{
-          height: "25%",
-          width: "100%",
-          backgroundColor: colors.lightBlue,
-          borderTopRightRadius: 18,
-          borderTopLeftRadius: 18,
-          position: "absolute",
-          bottom: 0,
-        }}
-      >
+      <BottomModalContainer>
         <View
           style={{
             height: "16%",
@@ -90,7 +81,7 @@ export default function ButtonModal({
             <FontAwesome name="female" size={45} color={colors.text} />
           </TouchableOpacity>
         </View>
-      </View>
+      </BottomModalContainer>
     </Modal>
   );
 }

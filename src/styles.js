@@ -75,3 +75,12 @@ export const ChartContainer = styled.View`
   position: relative;
   flex: 1;
 `;
+export const BottomModalContainer = styled.View`
+  height: 25%;
+  width: 100%;
+  background-color: ${colors.lightBlue};
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  position: absolute;
+  bottom: 0;
+`;

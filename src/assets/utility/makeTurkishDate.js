@@ -1,10 +1,13 @@
-export const makeTurkishDate = (date) => {
+export const makeTurkishDate = (date, ifYear = true) => {
   const indexOfSpace = date.indexOf(" ");
   const indexOfG = date.indexOf("G");
   const englishTime = date.slice(indexOfSpace + 1, indexOfG - 4);
   const secondSpace = englishTime.indexOf(" ");
   const englishMonth = englishTime.slice(0, secondSpace);
   const restOfDate = englishTime.slice(indexOfSpace, date.length);
+  const day = restOfDate.slice(1, 3);
+  const year = restOfDate.slice(4, 8);
+  const clock = restOfDate.slice(9, 14);
 
   let turkishMonth = "";
   if (englishMonth === "Jan") turkishMonth = "Ocak";
@@ -19,6 +22,10 @@ export const makeTurkishDate = (date) => {
   if (englishMonth === "Oct") turkishMonth = "Ekim";
   if (englishMonth === "Nov") turkishMonth = "Kasım";
   if (englishMonth === "Dec") turkishMonth = "Aralık";
-  console.log(turkishMonth);
-  return turkishMonth + restOfDate;
+
+  if (ifYear) {
+    return `${day} ${turkishMonth} ${year}  ${clock}`;
+  } else {
+    return `${day} ${turkishMonth} ${clock}`;
+  }
 };

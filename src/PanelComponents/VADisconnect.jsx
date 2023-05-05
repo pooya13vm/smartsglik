@@ -14,13 +14,10 @@ const VADisconnect = () => {
       <CarouselContainer>
         <View
           style={{
-            height: 500,
-            alignItems: "center",
-            alignSelf: "center",
-            marginBottom: "60%",
+            position: "relative",
           }}
         >
-          <VA width={(width * 80) / 100} />
+          <VA width={(width * 70) / 100} height={420} />
         </View>
       </CarouselContainer>
       <LinkGroup

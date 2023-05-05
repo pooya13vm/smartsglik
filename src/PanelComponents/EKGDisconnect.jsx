@@ -35,7 +35,7 @@ const EKGDisconnect = () => {
           style={{
             alignSelf: "center",
           }}
-          height={500}
+          height={350}
           autoPlay={true}
           scrollAnimationDuration={2000}
           renderItem={({ item }) => {
