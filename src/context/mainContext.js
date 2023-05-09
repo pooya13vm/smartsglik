@@ -6,10 +6,13 @@ export const AppProvider = ({ children }) => {
   const [isRegistered, setRegister] = useState(false);
   const [device, setDevice] = useState("");
   const [dopDataArray, setDopDataArray] = useState([]);
+  const [oxiDataArray, setOxiDataArray] = useState([]);
   const [user, setUser] = useState([]);
   const [userUpdated, setUserUpdated] = useState(false);
   const [alarms, setAlarms] = useState([]);
   const [heartBeat, setHeartBeat] = useState([]);
+  const [oxiPer, setOxiPer] = useState([]);
+  const [startTime, setStartTime] = useState();
   const [isAppLoading, setAppLoading] = useState(false);
 
   const checkStorage = async () => {
@@ -46,6 +49,15 @@ export const AppProvider = ({ children }) => {
       const parsST = JSON.parse(getST);
       if (parsST?.length > 0) {
         setAlarms(parsST);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      const getST = await AsyncStorage.getItem("@Oxi");
+      const parsST = JSON.parse(getST);
+      if (parsST?.length > 0) {
+        setOxiDataArray(parsST);
       }
     } catch (error) {
       console.log(error);
@@ -130,6 +142,24 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const saveNewOxiItem = (newItem) => {
+    setOxiDataArray([newItem, ...oxiDataArray]);
+    saveOxiDataToStorage([newItem, ...oxiDataArray]);
+  };
+  const deleteOxiItemHandler = (newArray) => {
+    setOxiDataArray(newArray);
+    saveOxiDataToStorage(newArray);
+  };
+
+  const saveOxiDataToStorage = async (newArray) => {
+    try {
+      const stringified = await JSON.stringify(newArray);
+      await AsyncStorage.setItem("@Oxi", stringified);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const ctx = React.useMemo(
     () => ({
       user,
@@ -140,6 +170,13 @@ export const AppProvider = ({ children }) => {
       alarms,
       heartBeat,
       isAppLoading,
+      oxiPer,
+      startTime,
+      oxiDataArray,
+      deleteOxiItemHandler,
+      saveNewOxiItem,
+      setOxiPer,
+      setStartTime,
       setAppLoading,
       setHeartBeat,
       saveNewAlarm,
@@ -163,6 +200,9 @@ export const AppProvider = ({ children }) => {
       alarms,
       heartBeat,
       isAppLoading,
+      oxiPer,
+      startTime,
+      oxiDataArray,
     ]
   );
   return <AppContext.Provider value={ctx}>{children}</AppContext.Provider>;

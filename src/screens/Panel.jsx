@@ -171,6 +171,7 @@ const Panel = (props) => {
 
   //------------------disconnect function --------------------------
   async function disconnectBluetooth() {
+    if (OxiInterval) clearInterval(OxiInterval);
     if (connectedDevice != null) {
       const isDeviceConnected = await connectedDevice.isConnected();
       if (isDeviceConnected) {

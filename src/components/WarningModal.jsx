@@ -24,6 +24,7 @@ export const WarningModal = ({
   message,
   result,
   resultFunction,
+  noFunction,
 }) => {
   return (
     <ModalContainer
@@ -51,7 +52,12 @@ export const WarningModal = ({
             justifyContent: "space-around",
           }}
         >
-          <ModalOutlineButton onPress={() => setVisibility(false)}>
+          <ModalOutlineButton
+            onPress={() => {
+              setVisibility(false);
+              noFunction && noFunction();
+            }}
+          >
             <ModalOutlineButtonText>
               {result ? "Hayır" : "Tamam"}
             </ModalOutlineButtonText>
