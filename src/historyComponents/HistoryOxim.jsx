@@ -16,6 +16,7 @@ import {
 import Share from "react-native-share";
 import ViewShot, { captureRef } from "react-native-view-shot";
 import { WarningModal } from "../components/WarningModal";
+import { TitleText } from "../components/TitleText";
 
 const ItemTitleText = styled.Text`
   font-size: 14px;
@@ -58,7 +59,7 @@ const ItemAverageText = styled.Text`
 export const HistoryOxim = () => {
   // context
   const { oxiDataArray, deleteOxiItemHandler } = useContext(AppContext);
-  console.log(oxiDataArray);
+
   // states
   const [isShowChartModal, setShowChartModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState({});
@@ -90,6 +91,7 @@ export const HistoryOxim = () => {
       console.log("Error:", error.message);
     }
   };
+  console.log(selectedItem);
   const deleteHandler = () => {
     const newArray = [];
     oxiDataArray.map((item) => {
@@ -105,109 +107,95 @@ export const HistoryOxim = () => {
   const notDeleteHandler = () => {
     setShowWarningModal(false);
   };
-
+  console.log(oxiDataArray);
   return (
     <PanelContentContainer>
-      <FlatList
-        data={oxiDataArray}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          return (
-            <ItemContainer
-              onPress={() => {
-                selectedItemHandler(item.id);
-                setShowChartModal(true);
-              }}
-            >
-              <ItemColum>
-                <ItemTitleText>Tarih: ​</ItemTitleText>
-                <ItemDateText>
-                  {makeTurkishDate(item.startTime, false)}
-                </ItemDateText>
-                <ItemTitleText> {"     "}Sure: </ItemTitleText>
-                <ItemDateText>
-                  {getTimeInterval(item.startTime, item.stopTime) === "00:00"
-                    ? "Bir Dakikadan Az"
-                    : getTimeInterval(item.startTime, item.stopTime)}
-                </ItemDateText>
-              </ItemColum>
-              {/* <ItemColum>
-                <ItemTitleText>Ort.Nabız</ItemTitleText>
-                <ItemAverageText>
-                  {Math.floor(
-                    item.heartArray.reduce((a, b) => a + b, 0) /
-                      item.heartArray.length
-                  )}
-                  <Text style={{ fontSize: 12 }}>BPM</Text>
-                </ItemAverageText>
-                <ItemTitleText>Ort.Oksijen</ItemTitleText>
-                <ItemAverageText>
-                  {Math.floor(
-                    item.oxiArray.reduce((a, b) => a + b, 0) /
-                      item.oxiArray.length
-                  )}
-                  <Text style={{ fontSize: 12 }}>%</Text>
-                </ItemAverageText>
-              </ItemColum> */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  height: 80,
-                  alignItems: "center",
-                  justifyContent: "space-around",
+      {oxiDataArray.length > 0 ? (
+        <FlatList
+          data={oxiDataArray}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            return (
+              <ItemContainer
+                onPress={() => {
+                  selectedItemHandler(item.id);
+                  setShowChartModal(true);
                 }}
               >
+                <ItemColum>
+                  <ItemTitleText>Tarih: ​</ItemTitleText>
+                  <ItemDateText>
+                    {makeTurkishDate(item.startTime, false)}
+                  </ItemDateText>
+                  <ItemTitleText> {"     "}Sure: </ItemTitleText>
+                  <ItemDateText>
+                    {getTimeInterval(item.startTime, item.stopTime) === "00:00"
+                      ? "Bir Dakikadan Az"
+                      : getTimeInterval(item.startTime, item.stopTime)}
+                  </ItemDateText>
+                </ItemColum>
                 <View
                   style={{
-                    borderWidth: 2,
-                    paddingHorizontal: 16,
-                    paddingVertical: 15,
-                    borderRadius: 50,
-                    borderColor: "#F73059",
+                    flexDirection: "row",
+                    height: 80,
+                    alignItems: "center",
+                    justifyContent: "space-around",
                   }}
                 >
-                  <FontAwesome5 name="heartbeat" size={24} color="#F73059" />
+                  <View
+                    style={{
+                      borderWidth: 2,
+                      paddingHorizontal: 16,
+                      paddingVertical: 15,
+                      borderRadius: 50,
+                      borderColor: "#F73059",
+                    }}
+                  >
+                    <FontAwesome5 name="heartbeat" size={24} color="#F73059" />
+                  </View>
+                  <View>
+                    <ItemTitleText>Ort.Nabız</ItemTitleText>
+                    <ItemAverageText>
+                      {Math.floor(
+                        item.heartArray.reduce((a, b) => a + b, 0) /
+                          item.heartArray.length
+                      )}
+                      <Text style={{ fontSize: 12 }}>BPM</Text>
+                    </ItemAverageText>
+                  </View>
+                  <View
+                    style={{
+                      borderWidth: 2,
+                      paddingHorizontal: 13,
+                      paddingVertical: 12,
+                      borderRadius: 50,
+                      borderColor: "#8ca6b9",
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="water-percent"
+                      size={32}
+                      color="#8ca6b9"
+                    />
+                  </View>
+                  <View>
+                    <ItemTitleText>Ort.Oksijen</ItemTitleText>
+                    <ItemAverageText>
+                      {Math.floor(
+                        item.oxiArray.reduce((a, b) => a + b, 0) /
+                          item.oxiArray.length
+                      )}
+                      <Text style={{ fontSize: 12 }}>%</Text>
+                    </ItemAverageText>
+                  </View>
                 </View>
-                <View>
-                  <ItemTitleText>Ort.Nabız</ItemTitleText>
-                  <ItemAverageText>
-                    {Math.floor(
-                      item.heartArray.reduce((a, b) => a + b, 0) /
-                        item.heartArray.length
-                    )}
-                    <Text style={{ fontSize: 12 }}>BPM</Text>
-                  </ItemAverageText>
-                </View>
-                <View
-                  style={{
-                    borderWidth: 2,
-                    paddingHorizontal: 13,
-                    paddingVertical: 12,
-                    borderRadius: 50,
-                    borderColor: "#8ca6b9",
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    name="water-percent"
-                    size={32}
-                    color="#8ca6b9"
-                  />
-                </View>
-                <View>
-                  <ItemTitleText>Ort.Oksijen</ItemTitleText>
-                  <ItemAverageText>
-                    {Math.floor(
-                      item.oxiArray.reduce((a, b) => a + b, 0) /
-                        item.oxiArray.length
-                    )}
-                    <Text style={{ fontSize: 12 }}>%</Text>
-                  </ItemAverageText>
-                </View>
-              </View>
-            </ItemContainer>
-          );
-        }}
-      />
+              </ItemContainer>
+            );
+          }}
+        />
+      ) : (
+        <TitleText children={"Kayıt Bulunamadı"} />
+      )}
       {selectedItem.id && (
         <ModalContainer
           heightPercentage={95}
@@ -352,7 +340,7 @@ export const HistoryOxim = () => {
                   height: "100%",
                 }}
                 formatLabel={(value) => `${value}`}
-                numberOfTicks={22}
+                numberOfTicks={10}
               />
               <LineChart
                 style={{ height: "100%", width: "86%", marginLeft: 32 }}
@@ -392,7 +380,7 @@ export const HistoryOxim = () => {
                 marginTop: 20,
               }}
             >
-              <DescriptionText children="Ort.Oksijen Seviyesi :" size={18} />
+              <DescriptionText children="Ort.Oksijen :" size={18} />
               <DescriptionText
                 children={` ${Math.floor(
                   selectedItem.oxiArray.reduce((a, b) => a + b, 0) /

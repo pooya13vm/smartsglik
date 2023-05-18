@@ -6,6 +6,7 @@ import {
   BackHandler,
   ScrollView,
   Keyboard,
+  Platform,
 } from "react-native";
 // import firebase from "../database/firebase";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -100,7 +101,7 @@ function SignUp({ navigation }) {
     email: "",
     pass: "",
   };
-
+  console.log("hi");
   const registerReducer = (state, action) => {
     switch (action.type) {
       case "ADD_NAME":
@@ -201,7 +202,6 @@ function SignUp({ navigation }) {
         <View style={{ marginTop: (height * 2) / 100 }}>
           <TitleText>Kullanıcı Bilgileri</TitleText>
         </View>
-
         <ScrollView
           style={{
             marginVertical: (height * 2) / 100,
@@ -282,7 +282,11 @@ function SignUp({ navigation }) {
             placeholder="Şifre*"
             iconName="lock"
             onChangeFun={(val) => dispatch({ type: "ADD_PASS", payload: val })}
-            keyboard="visible-password"
+            keyboard={
+              Platform.OS === "ios"
+                ? "ascii-capable-number-pad"
+                : "visible-password"
+            }
           />
         </ScrollView>
         <View
@@ -323,8 +327,8 @@ function SignUp({ navigation }) {
           />
         </ButtonContainer>
         {/* <ButtonContainer onPress={() => navigation.navigate("SignIn")}>
-        <SendToSigInText>Hesabın Var Mı ?</SendToSigInText>
-      </ButtonContainer> */}
+          <SendToSigInText>Hesabın Var Mı ?</SendToSigInText>
+        </ButtonContainer> */}
         {/* ----------------first modal---------- */}
         <ModalContainer heightPercentage={53} isModalVisible={isModalVisible}>
           <ModalTitle>

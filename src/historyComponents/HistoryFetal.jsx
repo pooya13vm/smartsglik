@@ -125,6 +125,7 @@ export const HistoryFetal = () => {
       ) : (
         <TitleText children={"Kayıt Bulunamadı"} />
       )}
+
       {!selectedItem ? (
         <HistoryFetalList
           dopDataArray={dopDataArray}

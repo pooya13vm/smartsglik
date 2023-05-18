@@ -1,5 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { View, LogBox, Alert, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  LogBox,
+  Alert,
+  TouchableOpacity,
+  Text,
+  Platform,
+} from "react-native";
 import { AppContext } from "../context/mainContext";
 import Lottie from "lottie-react-native";
 import { BleManager } from "react-native-ble-plx";
@@ -27,7 +34,6 @@ import OximConnect from "../PanelComponents/OximConnect";
 import OximDisconnect from "../PanelComponents/OximDisconnect";
 import VAConnect from "../PanelComponents/VAConnect";
 import VADisconnect from "../PanelComponents/VADisconnect";
-// import { getPermission } from "../assets/utility/getAndroidPermission";
 import ModalContainer from "../components/ModalContainer";
 import { SubmitBtn } from "../components/SubmitBtn";
 import { TitleText } from "../components/TitleText";
@@ -46,15 +52,24 @@ const Panel = (props) => {
   const [message, setMessage] = useState(0);
 
   useEffect(() => {
-    requestMultiple([
-      PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
-      PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
-      PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE,
-      PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
-      PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
-    ]).then((statuses) => {
-      console.log("ok");
-    });
+    if (Platform.OS === "android") {
+      requestMultiple([
+        PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION,
+        PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
+        PERMISSIONS.ANDROID.BLUETOOTH_ADVERTISE,
+        PERMISSIONS.ANDROID.BLUETOOTH_CONNECT,
+        PERMISSIONS.ANDROID.BLUETOOTH_SCAN,
+      ]).then((statuses) => {
+        console.log("ok");
+      });
+    }
+    if (Platform.OS === "ios") {
+      requestMultiple([
+        PERMISSIONS.IOS.BLUETOOTH_PERIPHERAL,
+        PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+        PERMISSIONS.IOS.MICROPHONE,
+      ]);
+    }
     BLTManager.state().then((val) => {
       if (val !== "PoweredOn") {
         BLTManager.enable().then(() => console.log("bluetooth is turned on"));
@@ -80,6 +95,7 @@ const Panel = (props) => {
       if (scannedDevice) {
         if (scannedDevice.name == "VTM AD5" && device == "Fetal Doppler") {
           BLTManager.stopDeviceScan();
+          console.log(scannedDevice.id);
           if (macAddressChecker(scannedDevice.id)) {
             connectDevice(scannedDevice);
             setScanning(false);
@@ -88,11 +104,15 @@ const Panel = (props) => {
             Alert.alert("Cihazınız firmamıza ait değildir.");
           }
         }
-        if (scannedDevice.name == "O2Ring 0217" && device == "Oksimetre") {
+        if (scannedDevice.name?.startsWith("O2Ring") && device == "Oksimetre") {
           BLTManager.stopDeviceScan();
-          connectDevice(scannedDevice);
-          setScanning(false);
-          setBluetoothModal(false);
+          if (macAddressChecker(scannedDevice.id)) {
+            connectDevice(scannedDevice);
+            setScanning(false);
+            setBluetoothModal(false);
+          } else {
+            Alert.alert("Cihazınız firmamıza ait değildir.");
+          }
         }
       }
     });
@@ -125,8 +145,9 @@ const Panel = (props) => {
             console.warn("message sended");
           });
         }
-        console.log(device.name);
-        if (device.name == "O2Ring 0217") {
+        console.log("device name: ", device.name);
+        if (device.name.startsWith("O2Ring")) {
+          console.log("in if");
           sendPasswordForOxi(device).then(() => {
             console.warn("message sended");
           });
@@ -146,15 +167,9 @@ const Panel = (props) => {
                   .replace(/\s\s+/g, " ")
                   .charCodeAt(11);
                 setMessage(message);
-                console.log(
-                  base64
-                    .decode(characteristic.value)
-                    .replace(/\s\s+/g, " ")
-                    .charCodeAt(11)
-                );
               }
 
-              if (device.name == "O2Ring 0217") {
+              if (device.name.startsWith("O2Ring")) {
                 let hex = base64ToHex(characteristic.value);
                 // console.log(hex.slice(16, 18));
                 let message = [
@@ -194,7 +209,7 @@ const Panel = (props) => {
     const byteArray = new Uint8Array([
       0xff, 0xfd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc,
     ]);
-    console.log("sending ....");
+
     BLTManager.writeCharacteristicWithResponseForDevice(
       device.id,
       "0000FFE5-0000-1000-8000-00805F9B34FB",
@@ -206,22 +221,25 @@ const Panel = (props) => {
       })
       .catch((e) => console.log("the error is:", e));
   };
+  // --------send data to Oximetre ----------------------
   const sendPasswordForOxi = async (device) => {
     const byteArray = new Uint8Array([
       0xaa, 0x17, 0xe8, 0x00, 0x00, 0x00, 0x00, 0x1b,
     ]);
-
+    console.log(byteArray);
+    console.log(device.id);
+    console.log(base64.encodeFromByteArray(byteArray));
     OxiInterval = setInterval(() => {
       BLTManager.writeCharacteristicWithResponseForDevice(
         device.id,
-        "14839ac4-7d7e-415c-9a42-167340cf2339",
-        "8b00ace7-eb0b-49b0-bbe9-9aee0a26e1a3",
+        "14839AC4-7D7E-415C-9A42-167340CF2339",
+        "8B00ACE7-EB0B-49B0-BBE9-9AEE0A26E1A3",
         base64.encodeFromByteArray(byteArray)
       )
         .then(() => {
           console.log("data sended successfully");
         })
-        .catch((e) => console.log(e));
+        .catch((e) => console.log("not send :", e));
     }, 1000);
   };
   return (

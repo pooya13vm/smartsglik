@@ -1,11 +1,17 @@
-import { View } from "react-native";
+import { View, Platform } from "react-native";
 import LinkedText from "../components/LinkedText";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { colors } from "../assets/utility/colors";
 
 const LinkGroup = ({ url1, url2 }) => {
   return (
-    <View style={{ alignItems: "center", justifyContent: "center" }}>
+    <View
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        paddingBottom: Platform.OS === "ios" ? 30 : 0,
+      }}
+    >
       <View
         style={{
           flexDirection: "row",

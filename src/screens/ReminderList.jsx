@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Platform,
 } from "react-native";
 import { AppContext } from "../context/mainContext";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -41,7 +42,10 @@ const ReminderList = () => {
         console.warn("Error requesting notification permission:", error);
       }
     };
-    requestNotificationPermission();
+    if (Platform.OS === "android") {
+      requestNotificationPermission();
+    }
+
     PushNotification.checkPermissions((res) => {
       if (!res.alert) {
         Alert.alert(

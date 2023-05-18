@@ -12,7 +12,11 @@ const LinkedText = ({ url, text, size = 15 }) => {
     }
   }, [url]);
   return (
-    <TouchableOpacity onPress={handleURLPress}>
+    <TouchableOpacity
+      onPress={() => {
+        if (url) handleURLPress();
+      }}
+    >
       <Text
         style={{ fontWeight: "500", color: colors.linkText, fontSize: size }}
       >

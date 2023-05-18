@@ -21,7 +21,7 @@ PODS:
   - ExpoModulesCore (1.1.1):
     - React-Core
     - ReactCommon/turbomodule/core
-  - EXSplashScreen (0.17.5):
+  - EXSplashScreen (0.18.2):
     - ExpoModulesCore
     - React-Core
   - FBLazyVector (0.70.5)
@@ -49,35 +49,43 @@ PODS:
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/Logger (~> 7.8)
-  - FirebaseCoreInternal (10.7.0):
+  - FirebaseCoreInternal (10.9.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
   - FirebaseDatabase (10.6.0):
     - FirebaseCore (~> 10.0)
     - leveldb-library (~> 1.22)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - GoogleUtilities/AppDelegateSwizzler (7.11.0):
+  - GoogleUtilities/AppDelegateSwizzler (7.11.1):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (7.11.0):
+  - GoogleUtilities/Environment (7.11.1):
     - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleUtilities/Logger (7.11.0):
+  - GoogleUtilities/Logger (7.11.1):
     - GoogleUtilities/Environment
-  - GoogleUtilities/Network (7.11.0):
+  - GoogleUtilities/Network (7.11.1):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (7.11.0)"
-  - GoogleUtilities/Reachability (7.11.0):
+  - "GoogleUtilities/NSData+zlib (7.11.1)"
+  - GoogleUtilities/Reachability (7.11.1):
     - GoogleUtilities/Logger
-  - GTMSessionFetcher/Core (3.1.0)
-  - leveldb-library (1.22.1)
+  - GTMSessionFetcher/Core (3.1.1)
+  - leveldb-library (1.22.2)
   - lottie-ios (3.4.0)
   - lottie-react-native (5.1.4):
     - lottie-ios (~> 3.4.0)
     - React-Core
   - MultiplatformBleAdapter (0.1.9)
+  - Permission-BluetoothPeripheral (3.8.0):
+    - RNPermissions
+  - Permission-LocationWhenInUse (3.8.0):
+    - RNPermissions
+  - Permission-Microphone (3.8.0):
+    - RNPermissions
+  - Permission-Notifications (3.8.0):
+    - RNPermissions
   - PromisesObjC (2.2.0)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -291,8 +299,6 @@ PODS:
   - react-native-ble-plx (2.0.3):
     - MultiplatformBleAdapter (= 0.1.9)
     - React-Core
-  - react-native-quick-base64 (2.0.5):
-    - React-Core
   - react-native-safe-area-context (4.4.1):
     - RCT-Folly
     - RCTRequired
@@ -444,6 +450,10 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - lottie-ios (from `../node_modules/lottie-ios`)
   - lottie-react-native (from `../node_modules/lottie-react-native`)
+  - Permission-BluetoothPeripheral (from `../node_modules/react-native-permissions/ios/BluetoothPeripheral`)
+  - Permission-LocationWhenInUse (from `../node_modules/react-native-permissions/ios/LocationWhenInUse`)
+  - Permission-Microphone (from `../node_modules/react-native-permissions/ios/Microphone`)
+  - Permission-Notifications (from `../node_modules/react-native-permissions/ios/Notifications`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -460,7 +470,6 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-ble-plx (from `../node_modules/react-native-ble-plx`)
-  - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
@@ -539,6 +548,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/lottie-ios"
   lottie-react-native:
     :path: "../node_modules/lottie-react-native"
+  Permission-BluetoothPeripheral:
+    :path: "../node_modules/react-native-permissions/ios/BluetoothPeripheral"
+  Permission-LocationWhenInUse:
+    :path: "../node_modules/react-native-permissions/ios/LocationWhenInUse"
+  Permission-Microphone:
+    :path: "../node_modules/react-native-permissions/ios/Microphone"
+  Permission-Notifications:
+    :path: "../node_modules/react-native-permissions/ios/Notifications"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -569,8 +586,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-ble-plx:
     :path: "../node_modules/react-native-ble-plx"
-  react-native-quick-base64:
-    :path: "../node_modules/react-native-quick-base64"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-slider:
@@ -640,22 +655,26 @@ SPEC CHECKSUMS:
   ExpoKeepAwake: 69b59d0a8d2b24de9f82759c39b3821fec030318
   ExpoLinearGradient: b40c2133ad57ae105b1b12a319e314463c817f6b
   ExpoModulesCore: 485dff3a59b036a33b6050c0a5aea3cf1037fdd1
-  EXSplashScreen: 3e989924f61a8dd07ee4ea584c6ba14be9b51949
+  EXSplashScreen: 0e0a9ba0cf7553094e93213099bd7b42e6e237e9
   FBLazyVector: affa4ba1bfdaac110a789192f4d452b053a86624
   FBReactNativeSpec: fe8b5f1429cfe83a8d72dc8ed61dc7704cac8745
   Firebase: f13680471b021937f2230ea8503c7809d8c29806
   FirebaseAuth: 743e5cd568af59d6d99a91ea9300843672515cf7
   FirebaseCore: fa80ad16a62d52f67274b5b88304c3a318bbf9a4
-  FirebaseCoreInternal: 8845798510aae74703467480f71ac613788d0696
+  FirebaseCoreInternal: d2b4acb827908e72eca47a9fd896767c3053921e
   FirebaseDatabase: c3ab8f695e48d4c4431f8406b58ebe543be185d9
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
-  GoogleUtilities: c2bdc4cf2ce786c4d2e6b3bcfd599a25ca78f06f
-  GTMSessionFetcher: c9e714f7eec91a55641e2bab9f45fd83a219b882
-  leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
+  GoogleUtilities: 9aa0ad5a7bc171f8bae016300bfcfa3fb8425749
+  GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
+  leveldb-library: f03246171cce0484482ec291f88b6d563699ee06
   lottie-ios: 69495122151a378fdc7d1bb4c5930347e37baf1f
   lottie-react-native: b702fab740cdb952a8e2354713d3beda63ff97b0
   MultiplatformBleAdapter: 5a6a897b006764392f9cef785e4360f54fb9477d
+  Permission-BluetoothPeripheral: 2d2d32c4651752655c19345abbb45ad15651f987
+  Permission-LocationWhenInUse: 1c80e4797ae587642a83125e80b86686cefeba53
+  Permission-Microphone: 644b1de8bcc2afcaf934e09a22bee507a95796a7
+  Permission-Notifications: aa91ec29236626ff59cb60e08389c0a59a9d32c5
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
   RCT-Folly: 0080d0a6ebf2577475bda044aa59e2ca1f909cda
   RCTRequired: 21229f84411088e5d8538f21212de49e46cc83e2
@@ -672,7 +691,6 @@ SPEC CHECKSUMS:
   React-jsinspector: badd81696361249893a80477983e697aab3c1a34
   React-logger: fdda34dd285bdb0232e059b19d9606fa0ec3bb9c
   react-native-ble-plx: f10240444452dfb2d2a13a0e4f58d7783e92d76e
-  react-native-quick-base64: e657e9197e61b60a9dec49807843052b830da254
   react-native-safe-area-context: 99b24a0c5acd0d5dcac2b1a7f18c49ea317be99a
   react-native-slider: cecabb58ecffad671d2ad3ccc58c7f4d2d029e95
   react-native-view-shot: 705f999ac2a24e4e6c909c0ca65c732ed33ca2ff
@@ -695,13 +713,13 @@ SPEC CHECKSUMS:
   RNFBAuth: 7cdeec8b6bea939a52c5211ffc17fcfa33fb1a65
   RNFBDatabase: 5227e668c84cc4521b5dc7b87689023fbcf9f698
   RNGestureHandler: 071d7a9ad81e8b83fe7663b303d132406a7d8f39
-  RNPermissions: 215c54462104b3925b412b0fb3c9c497b21c358b
+  RNPermissions: 0cb4fedb37bb0a4640d9f90dde13ca54852238e4
   RNReanimated: 0a5f87ec1da472cca3e835333fdebe51d983c411
   RNScreens: 34cc502acf1b916c582c60003dc3089fa01dc66d
   RNShare: eaee3dd5a06dad397c7d3b14762007035c5de405
   RNSVG: 07dbd870b0dcdecc99b3a202fa37c8ca163caec2
   Yoga: eca980a5771bf114c41a754098cd85e6e0d90ed7
 
-PODFILE CHECKSUM: 2e64a3664b507d65ef2a3fe65c9a9abdf4bb7598
+PODFILE CHECKSUM: 6942fb0e49e1c617ab4340779ec794d49ff1413b
 
 COCOAPODS: 1.12.0
