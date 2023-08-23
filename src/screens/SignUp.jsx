@@ -101,7 +101,6 @@ function SignUp({ navigation }) {
     email: "",
     pass: "",
   };
-  console.log("hi");
   const registerReducer = (state, action) => {
     switch (action.type) {
       case "ADD_NAME":

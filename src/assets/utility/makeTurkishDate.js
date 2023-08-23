@@ -1,4 +1,13 @@
+import { formatDateTime } from ".././utility/bluetoothConnection";
 export const makeTurkishDate = (date, ifYear = true) => {
+  if (!isNaN(+date)) {
+    if (date.length > 12) {
+      return formatDateTime(date);
+    } else {
+      return 0;
+    }
+  }
+
   const indexOfSpace = date.indexOf(" ");
   const indexOfG = date.indexOf("G");
   const englishTime = date.slice(indexOfSpace + 1, indexOfG - 4);

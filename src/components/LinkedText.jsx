@@ -4,8 +4,7 @@ import { colors } from "../assets/utility/colors";
 
 const LinkedText = ({ url, text, size = 15 }) => {
   const handleURLPress = useCallback(async () => {
-    const supported = await Linking.canOpenURL(url);
-    if (supported) {
+    if (true) {
       await Linking.openURL(url);
     } else {
       Alert.alert(`Don't know how to open this URL: ${url}`);

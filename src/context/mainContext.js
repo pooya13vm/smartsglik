@@ -1,12 +1,18 @@
 import React, { createContext, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { historyStringToArray } from "../assets/utility/historyStringToArray";
+import {
+  averageGroups,
+  findMinMax,
+  heartReportMaker,
+  oxiReportMaker,
+} from "../assets/utility/reportFunctions";
 
 export const AppContext = createContext({});
 export const AppProvider = ({ children }) => {
   const [isRegistered, setRegister] = useState(false);
   const [device, setDevice] = useState("");
   const [dopDataArray, setDopDataArray] = useState([]);
-  const [oxiDataArray, setOxiDataArray] = useState([]);
   const [user, setUser] = useState([]);
   const [userUpdated, setUserUpdated] = useState(false);
   const [alarms, setAlarms] = useState([]);
@@ -14,7 +20,14 @@ export const AppProvider = ({ children }) => {
   const [oxiPer, setOxiPer] = useState([]);
   const [startTime, setStartTime] = useState();
   const [isAppLoading, setAppLoading] = useState(false);
+  const [activeUser, setActiveUser] = useState({});
+  const [message, setMessage] = useState("");
+  const [historyListArray, setHistoryListArray] = useState([]);
+  const [isConnected, setConnected] = useState(false);
 
+  const userIndex = user?.findIndex((item) => item.status === "active");
+  // AsyncStorage.clear();
+  //------------ +check Storage++ --------------
   const checkStorage = async () => {
     try {
       const getST = await AsyncStorage.getItem("@User");
@@ -36,15 +49,6 @@ export const AppProvider = ({ children }) => {
       console.log(error);
     }
     try {
-      const getST = await AsyncStorage.getItem("@Sound");
-      const parsST = JSON.parse(getST);
-      if (parsST?.length > 0) {
-        setDopDataArray(parsST);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-    try {
       const getST = await AsyncStorage.getItem("@Alarms");
       const parsST = JSON.parse(getST);
       if (parsST?.length > 0) {
@@ -53,20 +57,27 @@ export const AppProvider = ({ children }) => {
     } catch (error) {
       console.log(error);
     }
+  };
+  //------------ ++device handlers++ --------------
+  const saveDeviceToStorage = async (newDevice) => {
     try {
-      const getST = await AsyncStorage.getItem("@Oxi");
-      const parsST = JSON.parse(getST);
-      if (parsST?.length > 0) {
-        setOxiDataArray(parsST);
-      }
+      const stringified = await JSON.stringify({ state: newDevice });
+      await AsyncStorage.setItem("@Device", stringified);
     } catch (error) {
       console.log(error);
     }
   };
-  // AsyncStorage.clear();
-
+  //------------ +++user handlers++ --------------
+  const activeUserHandler = () => {
+    const active = user.filter((u) => u.status === "active")[0];
+    if (active.dopDataArray) {
+      setDopDataArray([...active.dopDataArray]);
+    } else {
+      setDopDataArray([]);
+    }
+    setActiveUser({ ...active });
+  };
   const saveNewUser = (userObject) => {
-    console.log("new user:", userObject);
     userObject.status = "active";
     let userCopy = [...user];
     userCopy.map((item, index) => {
@@ -83,8 +94,8 @@ export const AppProvider = ({ children }) => {
     setUser(newArray);
     saveUserToStorage(newArray);
     setUserUpdated((per) => !per);
+    activeUserHandler();
   };
-
   const saveUserToStorage = async (userArray) => {
     try {
       const stringified = await JSON.stringify(userArray);
@@ -93,35 +104,8 @@ export const AppProvider = ({ children }) => {
       console.log(error);
     }
   };
-  const saveDeviceToStorage = async (newDevice) => {
-    try {
-      const stringified = await JSON.stringify({ state: newDevice });
-      await AsyncStorage.setItem("@Device", stringified);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
-  const saveSoundToStorage = async (sound) => {
-    console.log("object to save in storage:", sound);
-    const copyState = [sound, ...dopDataArray];
-    setDopDataArray(copyState);
-    try {
-      const stringified = await JSON.stringify(copyState);
-      await AsyncStorage.setItem("@Sound", stringified);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const saveSoundDeletedToStorage = async (newArray) => {
-    setDopDataArray(newArray);
-    try {
-      const stringified = await JSON.stringify(newArray);
-      await AsyncStorage.setItem("@Sound", stringified);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //------------ ++++alarm handlers++ --------------
   const saveNewAlarm = (newAlarm) => {
     const newArray = [newAlarm, ...alarms];
     setAlarms(newArray);
@@ -141,20 +125,122 @@ export const AppProvider = ({ children }) => {
       console.log(error);
     }
   };
-
+  //------------ +++++dopp  handlers++ --------------
+  const saveSoundToStorage = async (sound) => {
+    if (activeUser.dopDataArray) {
+      const newDataArray = [sound, ...activeUser.dopDataArray];
+      activeUser.dopDataArray = newDataArray;
+    } else {
+      activeUser.dopDataArray = [sound];
+    }
+    const stateCopy = [...user];
+    stateCopy[userIndex] = activeUser;
+    setUser(stateCopy);
+    saveUserChangesToStorage(stateCopy);
+    setDopDataArray([sound, ...dopDataArray]);
+  };
+  const saveSoundDeletedToStorage = async (newArray) => {
+    const stateCopy = [...user];
+    stateCopy[userIndex].dopDataArray = newArray;
+    setUser(stateCopy);
+    saveUserChangesToStorage(stateCopy);
+    setDopDataArray(newArray);
+  };
+  //------------ ++++++oxi handlers++ --------------
   const saveNewOxiItem = (newItem) => {
-    setOxiDataArray([newItem, ...oxiDataArray]);
-    saveOxiDataToStorage([newItem, ...oxiDataArray]);
-  };
-  const deleteOxiItemHandler = (newArray) => {
-    setOxiDataArray(newArray);
-    saveOxiDataToStorage(newArray);
+    console.log("new item to save 129", newItem);
+    const stateCopyOne = { ...activeUser };
+    if (activeUser.oxiDataArray) {
+      const newDataArray = [newItem, ...activeUser.oxiDataArray];
+      stateCopyOne.oxiDataArray = newDataArray;
+    } else {
+      stateCopyOne.oxiDataArray = [newItem];
+    }
+    const stateCopy = [...user];
+    stateCopy[userIndex] = stateCopyOne;
+    setUser(stateCopy);
+    saveUserChangesToStorage(stateCopy);
+    setUserUpdated((per) => !per);
   };
 
-  const saveOxiDataToStorage = async (newArray) => {
+  const deleteOxiItemHandler = (newArray) => {
+    const stateCopy = [...user];
+    stateCopy[userIndex].oxiDataArray = newArray;
+    setUser(stateCopy);
+    saveUserChangesToStorage(stateCopy);
+    setUserUpdated((per) => !per);
+  };
+  const saveHistoryItemToStorage = (itemObject) => {
+    console.log("item in 175", itemObject);
+    const dataString = historyStringToArray(itemObject.data);
+    const oxiArray = dataString.oxi;
+    const beatArray = dataString.beat;
+    let oxiArrayCleared = oxiArray.filter(
+      (index) => index >= 80 && index <= 100
+    );
+    let beatArrayCleared = beatArray.filter(
+      (index) => index >= 55 && index <= 160
+    );
+    console.log("in context 209", dataString);
+    const itemObj = {
+      startTime: itemObject.id,
+      stopTime: oxiArray.length * 8,
+      heartArray: averageGroups(beatArrayCleared),
+      oxiArray: averageGroups(oxiArrayCleared),
+      heartMM: findMinMax(beatArrayCleared),
+      oxiMM: findMinMax(oxiArrayCleared),
+      heartReport: heartReportMaker(beatArrayCleared),
+      oxiReport: oxiReportMaker(oxiArrayCleared),
+      id: itemObject.id,
+      timeDistance: "--",
+    };
+    const newItemInUser = { ...activeUser };
+    if (!activeUser.oxiDataArray) {
+      newItemInUser.oxiDataArray = [itemObj];
+    } else {
+      const isInData = activeUser.oxiDataArray.some(
+        (item) => item.id === itemObj.id
+      );
+      if (!isInData) {
+        newItemInUser.oxiDataArray.unshift(itemObj);
+      }
+    }
+    const stateCopy = [...user];
+    stateCopy[userIndex] = newItemInUser;
+    setUser(stateCopy);
+    saveUserChangesToStorage(stateCopy);
+    setUserUpdated((per) => !per);
+  };
+  //------------======== EKG handlers =====--------------
+  const saveEKGNewItem = (newItem) => {
+    console.log("new item to save 129", newItem);
+    if (activeUser.EKGDataArray) {
+      const newDataArray = [newItem, ...activeUser.EKGDataArray];
+      activeUser.EKGDataArray = newDataArray;
+    } else {
+      activeUser.EKGDataArray = [newItem];
+    }
+    const stateCopy = [...user];
+    stateCopy[userIndex] = activeUser;
+    setUser(stateCopy);
+    saveUserChangesToStorage(stateCopy);
+  };
+  const deleteEKGItem = (item) => {
+    const EKGArray = [...activeUser.EKGDataArray];
+    // console.log("229:", EKGArray);
+    const filtered = EKGArray.filter((val) => val.id !== item.id);
+    // console.log("229:", filtered);
+    const stateCopy = [...user];
+    stateCopy[userIndex].EKGDataArray = filtered;
+    setUser(stateCopy);
+    saveUserChangesToStorage(stateCopy);
+  };
+  //------------ save Item to storage handlers++ --------------
+  const saveUserChangesToStorage = async (newArray) => {
     try {
       const stringified = await JSON.stringify(newArray);
-      await AsyncStorage.setItem("@Oxi", stringified);
+      await AsyncStorage.setItem("@User", stringified);
+      setUserUpdated(!userUpdated);
     } catch (error) {
       console.log(error);
     }
@@ -163,6 +249,7 @@ export const AppProvider = ({ children }) => {
   const ctx = React.useMemo(
     () => ({
       user,
+      activeUser,
       isRegistered,
       device,
       dopDataArray,
@@ -172,7 +259,14 @@ export const AppProvider = ({ children }) => {
       isAppLoading,
       oxiPer,
       startTime,
-      oxiDataArray,
+      message,
+      historyListArray,
+      isConnected,
+      setConnected,
+      setHistoryListArray,
+      setMessage,
+      setActiveUser,
+      activeUserHandler,
       deleteOxiItemHandler,
       saveNewOxiItem,
       setOxiPer,
@@ -190,11 +284,17 @@ export const AppProvider = ({ children }) => {
       saveSoundDeletedToStorage,
       updateUsers,
       deleteAlarmHandler,
+      saveHistoryItemToStorage,
+      saveEKGNewItem,
+      deleteEKGItem,
     }),
     [
+      message,
+      isConnected,
       isRegistered,
       device,
       user,
+      activeUser,
       dopDataArray,
       userUpdated,
       alarms,
@@ -202,7 +302,7 @@ export const AppProvider = ({ children }) => {
       isAppLoading,
       oxiPer,
       startTime,
-      oxiDataArray,
+      historyListArray,
     ]
   );
   return <AppContext.Provider value={ctx}>{children}</AppContext.Provider>;

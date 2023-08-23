@@ -64,18 +64,37 @@ const ItemAverageText = styled.Text`
 
 export const HistoryOxim = () => {
   // context
-  const { oxiDataArray, deleteOxiItemHandler } = useContext(AppContext);
-
+  const { deleteOxiItemHandler, activeUser, userUpdated } =
+    useContext(AppContext);
   // states
   const [isShowChartModal, setShowChartModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState({});
   const [showWarningModal, setShowWarningModal] = useState(false);
+  const [isHistoryItem, setIsHistoryItem] = useState(false);
+  const [oxiDataArray, setOxiDataArray] = useState([]);
+
   const chartRef = useRef(null);
+
+  useEffect(() => {
+    setOxiDataArray(activeUser.oxiDataArray);
+    if (selectedItem.stopTime) {
+      if (makeTurkishDate(selectedItem?.stopTime, false) == 0) {
+        setIsHistoryItem(true);
+      }
+    }
+    console.log("in 84:", activeUser);
+  }, [selectedItem.stopTime, userUpdated]);
 
   function getTimeInterval(dateStr1, dateStr2) {
     const date1 = new Date(dateStr1);
     const date2 = new Date(dateStr2);
-    const timeInterval = Math.abs(date2 - date1);
+    let timeInterval;
+    if (!isNaN(dateStr2)) {
+      timeInterval = dateStr2 * 500;
+    } else {
+      timeInterval = Math.abs(date2 - date1);
+    }
+
     const seconds = Math.floor(timeInterval / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
@@ -107,13 +126,34 @@ export const HistoryOxim = () => {
         newArray.unshift(item);
       }
     });
+    console.log("in 128:", newArray);
     deleteOxiItemHandler(newArray);
     setShowChartModal(false);
+    setOxiDataArray(newArray);
     notDeleteHandler();
     setSelectedItem({});
   };
   const notDeleteHandler = () => {
     setShowWarningModal(false);
+  };
+  const percentageCalculator = (item, level) => {
+    if (item === "heart") {
+      const values = Object.values(selectedItem.heartReport);
+      const total = values.reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0
+      );
+      const percentage = (selectedItem.heartReport[level] * 100) / total;
+      return Math.round(percentage);
+    } else if (item === "oxi") {
+      const values = Object.values(selectedItem.oxiReport);
+      const total = values.reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0
+      );
+      const percentage = (selectedItem.oxiReport[level] * 100) / total;
+      return Math.round(percentage);
+    }
   };
 
   function formatTime(seconds) {
@@ -126,9 +166,10 @@ export const HistoryOxim = () => {
 
     return `${minutesString} ${secondsString}`;
   }
+
   return (
     <PanelContentContainer>
-      {oxiDataArray.length > 0 ? (
+      {activeUser.oxiDataArray ? (
         <FlatList
           data={oxiDataArray}
           keyExtractor={(item) => item.id}
@@ -291,12 +332,15 @@ export const HistoryOxim = () => {
                   paddingVertical: 10,
                 }}
               >
+                <ItemTitleText>Kullanıcı: {activeUser.name} </ItemTitleText>
                 <ItemTitleText>
                   Başlangıç: {makeTurkishDate(selectedItem.startTime, false)}
                 </ItemTitleText>
-                <ItemTitleText>
-                  Bitirme: {makeTurkishDate(selectedItem.stopTime, false)}
-                </ItemTitleText>
+                {!isHistoryItem && (
+                  <ItemTitleText>
+                    Bitirme: {makeTurkishDate(selectedItem.stopTime, false)}
+                  </ItemTitleText>
+                )}
                 <ItemTitleText>
                   Sure:{" "}
                   {getTimeInterval(
@@ -325,8 +369,13 @@ export const HistoryOxim = () => {
                 >
                   <ItemTitleText>{`> 120`}</ItemTitleText>
                   <ItemTitleText>
-                    {formatTime(selectedItem.heartReport.top)}
+                    {percentageCalculator("heart", "top")}%
                   </ItemTitleText>
+                  {!isHistoryItem && (
+                    <ItemTitleText>
+                      {formatTime(selectedItem.heartReport.top)}
+                    </ItemTitleText>
+                  )}
                 </View>
                 <View
                   style={{
@@ -339,8 +388,13 @@ export const HistoryOxim = () => {
                 >
                   <ItemTitleText>50-120</ItemTitleText>
                   <ItemTitleText>
-                    {formatTime(selectedItem.heartReport.middle)}
+                    {percentageCalculator("heart", "middle")}%
                   </ItemTitleText>
+                  {!isHistoryItem && (
+                    <ItemTitleText>
+                      {formatTime(selectedItem.heartReport.middle)}
+                    </ItemTitleText>
+                  )}
                 </View>
                 <View
                   style={{
@@ -353,8 +407,13 @@ export const HistoryOxim = () => {
                 >
                   <ItemTitleText>{`> 50`}</ItemTitleText>
                   <ItemTitleText>
-                    {formatTime(selectedItem.heartReport.down)}
+                    {percentageCalculator("heart", "down")}%
                   </ItemTitleText>
+                  {!isHistoryItem && (
+                    <ItemTitleText>
+                      {formatTime(selectedItem.heartReport.down)}
+                    </ItemTitleText>
+                  )}
                 </View>
                 <Text>------------------------------------</Text>
                 <DescriptionText
@@ -372,8 +431,13 @@ export const HistoryOxim = () => {
                 >
                   <ItemTitleText>95%-100%</ItemTitleText>
                   <ItemTitleText>
-                    {formatTime(selectedItem.oxiReport.top)}
+                    {percentageCalculator("oxi", "top")}%
                   </ItemTitleText>
+                  {!isHistoryItem && (
+                    <ItemTitleText>
+                      {formatTime(selectedItem.oxiReport.top)}
+                    </ItemTitleText>
+                  )}
                 </View>
                 <View
                   style={{
@@ -386,8 +450,13 @@ export const HistoryOxim = () => {
                 >
                   <ItemTitleText>90%-94%</ItemTitleText>
                   <ItemTitleText>
-                    {formatTime(selectedItem.oxiReport.middle)}
+                    {percentageCalculator("oxi", "middle")}%
                   </ItemTitleText>
+                  {!isHistoryItem && (
+                    <ItemTitleText>
+                      {formatTime(selectedItem.oxiReport.middle)}
+                    </ItemTitleText>
+                  )}
                 </View>
                 <View
                   style={{
@@ -400,8 +469,13 @@ export const HistoryOxim = () => {
                 >
                   <ItemTitleText>{`<90%`}</ItemTitleText>
                   <ItemTitleText>
-                    {formatTime(selectedItem.oxiReport.down)}
+                    {percentageCalculator("oxi", "down")}%
                   </ItemTitleText>
+                  {!isHistoryItem && (
+                    <ItemTitleText>
+                      {formatTime(selectedItem.oxiReport.down)}
+                    </ItemTitleText>
+                  )}
                 </View>
               </View>
               <View

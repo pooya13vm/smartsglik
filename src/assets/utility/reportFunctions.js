@@ -4,9 +4,11 @@ export const oxiReportMaker = (arr) => {
   let middle = 0;
   let down = 0;
   arr.map((item) => {
-    if (item >= 95) top += 1;
-    if (item < 95 && item >= 90) middle += 1;
-    if (item > 95) down += 1;
+    if (item >= 95) {
+      top++;
+    } else if (item < 95 && item >= 90) {
+      middle++;
+    } else if (item < 95) down++;
   });
   return { top, middle, down };
 };
@@ -15,9 +17,11 @@ export const heartReportMaker = (arr) => {
   let middle = 0;
   let down = 0;
   arr.map((item) => {
-    if (item >= 120) top += 1;
-    if (item < 120 && item >= 50) middle += 1;
-    if (item < 50) down += 1;
+    if (item >= 120) {
+      top++;
+    } else if (item < 120 && item >= 50) {
+      middle++;
+    } else if (item < 50) down++;
   });
   return { top, middle, down };
 };

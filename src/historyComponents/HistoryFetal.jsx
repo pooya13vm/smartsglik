@@ -22,6 +22,7 @@ export const HistoryFetal = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [data, setData] = useState([]);
   const [XData, setXData] = useState([]);
+  // const [dopDataArray, setDopDataArray] = useState([]);
   // context
   const { dopDataArray } = useContext(AppContext);
   const chartRef = useRef(null);
@@ -40,6 +41,7 @@ export const HistoryFetal = () => {
   };
 
   useEffect(() => {
+    // setDopDataArray([...activeUser.dopDataArray]);
     let myArray = [];
     dopDataArray.map((item) => {
       if (myArray.length <= 12) {
@@ -57,7 +59,6 @@ export const HistoryFetal = () => {
       XArray.unshift(`${month}/${day}`);
     });
     setXData(XArray);
-    console.log(XData);
   }, [dopDataArray.length]);
 
   return (

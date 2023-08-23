@@ -41,7 +41,7 @@ const TopText = styled.Text`
   margin-bottom: 10px;
 `;
 
-const DoppConnect = ({ message, disconnectBluetooth }) => {
+const DoppConnect = ({ disconnectBluetooth }) => {
   const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isFinishedRec, setIsFinishedRec] = useState(false);
@@ -53,7 +53,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [standbyMode, setStandbyMode] = useState(false);
 
-  const { saveSoundToStorage, heartBeat, setHeartBeat } =
+  const { saveSoundToStorage, heartBeat, setHeartBeat, message } =
     useContext(AppContext);
 
   function formatTime(milliseconds) {
@@ -231,7 +231,7 @@ const DoppConnect = ({ message, disconnectBluetooth }) => {
           >
             <TopTextContainer>
               <TopTextRow>
-                <TopTextNumber>{message}</TopTextNumber>
+                <TopTextNumber>{isNaN(message) ? 0 : message}</TopTextNumber>
                 <TopText>BPM</TopText>
               </TopTextRow>
             </TopTextContainer>

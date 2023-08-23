@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { View, TouchableOpacity, Modal } from "react-native";
+import { View, TouchableOpacity, Modal, Text } from "react-native";
 import { BlockContainer, PanelContentContainer, BlockTitle } from "../styles";
 import styled from "styled-components";
 import { colors } from "../assets/utility/colors";
@@ -39,11 +39,16 @@ const TopText = styled.Text`
   margin-bottom: 10px;
 `;
 
-const OximConnect = ({ message, disconnectBluetooth }) => {
+const OximConnect = ({
+  deviceInfo,
+  disconnectBluetooth,
+  repeatSendingData,
+}) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [heartBeatItem, setHeartBeatItem] = useState(0);
   const [oxiPerItem, setOxiPerItem] = useState(0);
   const [waitingModal, setWaitingModal] = useState(true);
+  const [batteryPer, setBatteryPer] = useState("");
 
   const {
     heartBeat,
@@ -53,9 +58,20 @@ const OximConnect = ({ message, disconnectBluetooth }) => {
     startTime,
     setStartTime,
     saveNewOxiItem,
+    message,
+    isConnected,
+    // historyListArray,
   } = useContext(AppContext);
 
+  // setTimeout(() => {
+  //   setWaitingModal(false);
+  // }, 1000);
+
   useEffect(() => {
+    if (deviceInfo.bat) {
+      setBatteryPer(deviceInfo.bat);
+    }
+    console.log("message in connect useeffect:", message);
     if (!startTime) setStartTime(new Date());
     if (message[0] > 0 && message[0] < 220) {
       setWaitingModal(false);
@@ -64,7 +80,7 @@ const OximConnect = ({ message, disconnectBluetooth }) => {
       setHeartBeat([...heartBeat, message[0]]);
       setOxiPer([...oxiPer, message[1]]);
     }
-  }, [message[0]]);
+  }, [message]);
 
   const timeDistanceHandler = () => {
     if (heartBeat.length <= 20) return "1 Saniye";
@@ -76,11 +92,14 @@ const OximConnect = ({ message, disconnectBluetooth }) => {
     if (heartBeat.length <= 600) return "30 Saniye";
     if (heartBeat.length > 600) return "1 Dakika";
   };
+
   //------------------- handlers -----------------
   const noSaveHandler = () => {
     setShowSaveModal(false);
     setHeartBeat([]);
     setOxiPer([]);
+    setHeartBeatItem(0);
+    setOxiPerItem(0);
     disconnectBluetooth();
     setStartTime(null);
   };
@@ -103,6 +122,18 @@ const OximConnect = ({ message, disconnectBluetooth }) => {
 
   return (
     <PanelContentContainer>
+      <View
+        style={{
+          position: "absolute",
+          top: -30,
+          flexDirection: "row",
+          left: "45%",
+        }}
+      >
+        <FontAwesome5 name="battery-empty" size={22} color={colors.text} />
+        <TitleText size={18}>{batteryPer}</TitleText>
+      </View>
+
       <BlockContainer>
         <View
           style={{

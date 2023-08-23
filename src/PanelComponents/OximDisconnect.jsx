@@ -22,7 +22,8 @@ const OximDisconnect = () => {
 
   useEffect(() => {
     if (heartBeat.length > 0) {
-      setShowSaveModal(true);
+      // setShowSaveModal(true);
+      setHeartBeat([]);
     }
   }, []);
   const noSaveHandler = () => {
@@ -53,6 +54,7 @@ const OximDisconnect = () => {
         url1={
           "https://www.sush.com.tr/wp-content/uploads/2023/02/Smart-Yuzuk-Oksimetre-Kullanim-Kilavuzu.pdf"
         }
+        url2={"https://youtu.be/GJ684JzDx0U"}
       />
       <SaveQuestionModal
         showSaveModal={showSaveModal}

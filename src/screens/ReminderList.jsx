@@ -96,12 +96,10 @@ const ReminderList = () => {
       playSound: true,
       importance: Importance.HIGH,
       soundName: "sound1",
-      // repeatType: "time",
       color: colors.lightBlue,
       id: UNId,
       vibration: true,
       ignoreInForeground: false,
-      // repeatTime: 1,
     });
     const alarmObj = {
       id: UNId,
@@ -163,31 +161,40 @@ const ReminderList = () => {
                           {item.message}
                         </DescriptionText>
                       </View>
-                      <View style={{ width: "10%" }}>
-                        <FontAwesome5
-                          name={
-                            item.time.mil > currentTime.getTime()
-                              ? "bell"
-                              : "bell-slash"
-                          }
-                          size={22}
-                          color={colors.text}
-                        />
-                      </View>
 
-                      <View style={{ width: "25%", alignItems: "center" }}>
+                      <View style={{ width: "45%", alignItems: "center" }}>
                         <DescriptionText size={16}>
                           {makeTurkishDate(item.time.time)}
                         </DescriptionText>
                       </View>
                     </>
                   )}
-                  <TouchableOpacity
-                    onPress={() => deleteHandler(item.id)}
-                    style={{ width: "20%", alignItems: "flex-end" }}
+                  <View
+                    style={{
+                      width: "10%",
+                      alignItems: "center",
+                    }}
                   >
-                    <FontAwesome5 name="trash" size={22} color={colors.text} />
-                  </TouchableOpacity>
+                    <FontAwesome5
+                      name={
+                        item.time.mil > currentTime.getTime()
+                          ? "bell"
+                          : "bell-slash"
+                      }
+                      size={22}
+                      color={colors.text}
+                    />
+                    <TouchableOpacity
+                      onPress={() => deleteHandler(item.id)}
+                      style={{ paddingTop: 10 }}
+                    >
+                      <FontAwesome5
+                        name="trash"
+                        size={22}
+                        color={colors.text}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </ListItemContainer>
             );
