@@ -88,6 +88,9 @@ function SplashScreen({ navigation }) {
           </Text>
         </View>
       </View>
+      <View>
+        <Text>Versiyon 1.3.9</Text>
+      </View>
 
       <Svg
         height={90}

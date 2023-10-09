@@ -44,7 +44,6 @@ export const CarouselContainer = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
-  z-index: 2;
 `;
 export const BlockContainer = styled.View`
   width: 100%;

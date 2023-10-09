@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { View, TouchableOpacity, Modal, Text } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { BlockContainer, PanelContentContainer, BlockTitle } from "../styles";
 import styled from "styled-components";
 import { colors } from "../assets/utility/colors";
@@ -39,11 +39,7 @@ const TopText = styled.Text`
   margin-bottom: 10px;
 `;
 
-const OximConnect = ({
-  deviceInfo,
-  disconnectBluetooth,
-  repeatSendingData,
-}) => {
+const OximConnect = ({ deviceInfo, disconnectBluetooth }) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [heartBeatItem, setHeartBeatItem] = useState(0);
   const [oxiPerItem, setOxiPerItem] = useState(0);
@@ -72,8 +68,9 @@ const OximConnect = ({
       setBatteryPer(deviceInfo.bat);
     }
     console.log("message in connect useeffect:", message);
-    if (!startTime) setStartTime(new Date());
+    // if (!startTime) setStartTime(new Date());
     if (message[0] > 0 && message[0] < 220) {
+      if (!startTime) setStartTime(new Date());
       setWaitingModal(false);
       setHeartBeatItem(message[0]);
       setOxiPerItem(message[1]);
@@ -212,7 +209,7 @@ const OximConnect = ({
         noSaveHandler={noSaveHandler}
         saveHandler={saveHandler}
       />
-      <Modal visible={waitingModal} transparent={true}>
+      {/* <Modal visible={waitingModal} transparent={true}>
         <View
           style={{
             backgroundColor: "rgba(202,216,222,0.8)",
@@ -226,7 +223,7 @@ const OximConnect = ({
             autoPlay
           />
         </View>
-      </Modal>
+      </Modal> */}
     </PanelContentContainer>
   );
 };

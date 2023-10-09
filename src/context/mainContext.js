@@ -79,6 +79,7 @@ export const AppProvider = ({ children }) => {
   };
   const saveNewUser = (userObject) => {
     userObject.status = "active";
+    userObject.oxiDataArray = [];
     let userCopy = [...user];
     userCopy.map((item, index) => {
       if (item.status === "active") {

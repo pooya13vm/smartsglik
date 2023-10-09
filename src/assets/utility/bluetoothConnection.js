@@ -95,11 +95,11 @@ export const serviceUUIDhandler = (device) => {
   if (device === "VTM AD5") return "0000FFE0-0000-1000-8000-00805F9B34FB";
   if (device.startsWith("O2Ring") || device.startsWith("DuoEK"))
     return "14839AC4-7D7E-415C-9A42-167340CF2339";
-  if (device === "Vücut Analizi") return "0000ffb0-0000-1000-8000-00805f9b34fb";
+  if (device === "F8") return "0000ffb0-0000-1000-8000-00805f9b34fb";
 };
 export const receiveUUIDhandler = (device) => {
   if (device === "VTM AD5") return "0000FFE4-0000-1000-8000-00805F9B34FB";
-  if (device === "Vücut Analizi") return "0000ffb2-0000-1000-8000-00805f9b34fb";
+  if (device === "F8") return "0000ffb2-0000-1000-8000-00805f9b34fb";
   if (device.startsWith("O2Ring"))
     return "0734594A-A8E7-4B1A-A6B1-CD5243059A57";
   if (device.startsWith("DuoEK")) return "0734594a-a8e7-4b1a-a6b1-cd5243059a57";

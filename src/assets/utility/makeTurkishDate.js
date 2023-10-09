@@ -24,10 +24,12 @@ export const makeTurkishDate = (date, ifYear = true) => {
   if (englishMonth === "Mar") turkishMonth = "Mart";
   if (englishMonth === "Apr") turkishMonth = "Nisan";
   if (englishMonth === "May") turkishMonth = "Mayıs";
-  if (englishMonth === "June") turkishMonth = "Haziran";
-  if (englishMonth === "July") turkishMonth = "Temmuz";
+  if (englishMonth === "June" || englishMonth === "Jun")
+    turkishMonth = "Haziran";
+  if (englishMonth === "July" || englishMonth === "Jul")
+    turkishMonth = "Temmuz";
   if (englishMonth === "Aug") turkishMonth = "Ağustos";
-  if (englishMonth === "Sept") turkishMonth = "Eylül";
+  if (englishMonth === "Sept" || englishMonth === "Sep") turkishMonth = "Eylül";
   if (englishMonth === "Oct") turkishMonth = "Ekim";
   if (englishMonth === "Nov") turkishMonth = "Kasım";
   if (englishMonth === "Dec") turkishMonth = "Aralık";

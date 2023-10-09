@@ -15,9 +15,13 @@ const VADisconnect = () => {
         <View
           style={{
             position: "relative",
+            height: 300,
+            display: "flex",
+            justifyContent: "center",
+            zIndex: 0,
           }}
         >
-          <VA width={(width * 70) / 100} height={420} />
+          <VA width={(width * 70) / 100} />
         </View>
       </CarouselContainer>
       <LinkGroup

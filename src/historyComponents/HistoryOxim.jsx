@@ -82,8 +82,7 @@ export const HistoryOxim = () => {
         setIsHistoryItem(true);
       }
     }
-    console.log("in 84:", activeUser);
-  }, [selectedItem.stopTime, userUpdated]);
+  }, [selectedItem.stopTime, userUpdated, activeUser.oxiDataArray.length]);
 
   function getTimeInterval(dateStr1, dateStr2) {
     const date1 = new Date(dateStr1);
@@ -169,7 +168,7 @@ export const HistoryOxim = () => {
 
   return (
     <PanelContentContainer>
-      {activeUser.oxiDataArray ? (
+      {activeUser.oxiDataArray.length > 0 ? (
         <FlatList
           data={oxiDataArray}
           keyExtractor={(item) => item.id}
@@ -183,9 +182,7 @@ export const HistoryOxim = () => {
               >
                 <ItemColum>
                   <ItemTitleText>Tarih: ​</ItemTitleText>
-                  <ItemDateText>
-                    {makeTurkishDate(item.startTime, false)}
-                  </ItemDateText>
+                  <ItemDateText>{makeTurkishDate(item.startTime)}</ItemDateText>
                   <ItemTitleText> {"     "}Sure: </ItemTitleText>
                   <ItemDateText>
                     {getTimeInterval(item.startTime, item.stopTime) === "00:00"

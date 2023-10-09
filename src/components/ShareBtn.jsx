@@ -8,13 +8,38 @@ import { Feather } from "@expo/vector-icons";
 
 const ShareBtn = ({ item, dataArray, name }) => {
   const [pdfPath, setPdfPath] = useState(null);
+  function formatTime(seconds) {
+    if (typeof seconds !== "number" || isNaN(seconds) || seconds < 0) {
+      return "Invalid input";
+    }
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    const formattedTime = [];
+
+    if (hours > 0) {
+      formattedTime.push(`${hours}h`);
+    }
+
+    if (minutes > 0) {
+      formattedTime.push(`${minutes}m`);
+    }
+
+    if (remainingSeconds > 0 || formattedTime.length === 0) {
+      formattedTime.push(`${remainingSeconds}s`);
+    }
+
+    return formattedTime.join(" ");
+  }
 
   const target = dataArray.filter((ite) => ite.id === item);
   const dataString = historyStringToArray(target[0].data);
   const beat = dataString.beat;
   const beatString = beat.join("-");
   const oxi = dataString.oxi;
-  const time = oxi.length * 8;
+  const time = oxi.length * 4;
   const oxiString = oxi.join(" - ");
   console.log(beat);
   const shareHandler = async () => {
@@ -33,9 +58,9 @@ const ShareBtn = ({ item, dataArray, name }) => {
   const generatePDF = async () => {
     const htmlContent = `<h1>SMART SAĞLIK</h1><h3>Oksimetre Ölçüm Sonuçları</h3><h3>Kullanıcı Adı: ${name}</h3><h3>Tarih:${formatDateTime(
       item
-    )}</h3><h3>süresi :${Math.round(
-      time / 60
-    )} dakika</h3><h4>Not: Veriler 8 saniye ara ile kaydedilmiştir.</h4><p>Nabiz: ${beatString}</p><p>Oksijen Seviyesi: ${oxiString}</p>`;
+    )}</h3><h3>süresi :${formatTime(
+      time
+    )}</h3><h4>Not: Veriler 4 saniye ara ile kaydedilmiştir.</h4><p>Nabiz: ${beatString}</p><p>Oksijen Seviyesi: ${oxiString}</p>`;
 
     const options = {
       html: htmlContent,

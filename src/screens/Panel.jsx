@@ -103,7 +103,6 @@ const Panel = (props) => {
   const [gettingInfoModal, setGettingInfoModal] = useState(false);
 
   useEffect(() => {
-    console.log("106:", activeUser);
     activeUserHandler();
     if (Platform.OS === "android") {
       requestMultiple([
@@ -180,17 +179,16 @@ const Panel = (props) => {
       }
     });
   };
+
   //-----------------start connecting -------------------
   const connectingToDevice = async () => {
-    await BLTManager.state()
-      .then(async (val) => {
-        if (val !== "PoweredOn") {
-          await BLTManager.enable().then(() =>
-            console.log("bluetooth is turned on")
-          );
-        }
-      })
-      .then(() => {
+    try {
+      const val = await BLTManager.state();
+      console.log(val);
+      if (val !== "PoweredOn") {
+        console.log("189:", val);
+        Alert.alert("Lütfen Bluetooth'u Açın", "", [{ text: "Tamam" }]);
+      } else {
         if (!isConnected) {
           setScanning(true);
           if (!gettingInfoModal) {
@@ -198,8 +196,12 @@ const Panel = (props) => {
           }
           scanDevices();
         }
-      });
+      }
+    } catch (error) {
+      console.log("Error:", error);
+    }
   };
+
   //----------------------scanning --------------------------
 
   const scanDevices = async () => {
@@ -208,7 +210,6 @@ const Panel = (props) => {
         console.warn("error line 206", error);
       }
       if (scannedDevice) {
-        console.log("219", scanDevices.name);
         if (scannedDevice.name == "VTM AD5" && device == "Fetal Doppler") {
           BLTManager.stopDeviceScan();
 
@@ -240,8 +241,16 @@ const Panel = (props) => {
           //   Alert.alert("Cihazınız firmamıza ait değildir.");
           // }
         }
+        console.log(device);
+        if (scannedDevice.name === "F8" && device == "Vücut Analizi") {
+          BLTManager.stopDeviceScan();
+          connectDevice(scannedDevice);
+          setScanning(false);
+          setBluetoothModal(false);
+        }
       }
     });
+
     // stop scanning devices after 5 seconds
     setTimeout(() => {
       BLTManager.stopDeviceScan();
@@ -289,6 +298,7 @@ const Panel = (props) => {
             console.warn("message sended");
           });
         }
+        //**no data send need for F8
 
         device.monitorCharacteristicForService(
           serviceUUIDhandler(device.name),
@@ -327,6 +337,10 @@ const Panel = (props) => {
                   setMessage("0");
                 }
               }
+              if (device.name === "F8") {
+                let kiloData = base64ToHex(characteristic.value).slice(13, 18);
+                setMessage(parseInt(kiloData, 16));
+              }
             }
           },
           "transactionID"
@@ -345,7 +359,10 @@ const Panel = (props) => {
 
     setDeviceInfo({});
     setConnectedDevice(undefined);
-    await BLTManager.disable().then(() => console.log("bluetooth off"));
+    console.log("in disconnect 357:", connectedDevice.id);
+    await BLTManager.cancelDeviceConnection(connectedDevice.id).then(() =>
+      console.log("connection canceled")
+    );
     if (connectedDevice != null) {
       const isDeviceConnected = await connectedDevice.isConnected();
       if (isDeviceConnected) {
@@ -366,6 +383,10 @@ const Panel = (props) => {
       }
     }
   }
+  //-------------------------------------------------------------------
+  // ---------------------send data to tarti ----------------------------
+  //--------------------=+++++++++++++++++++++----------------------------
+  const sendDataToVA = async (device) => {};
   //-------------------------------------------------------------------
   // ---------------------send data to EKG ----------------------------
   //--------------------********************----------------------------
@@ -392,6 +413,7 @@ const Panel = (props) => {
   //-------------------------------------------------------------------
 
   const sendPassToGetInfo = async (device) => {
+    setGettingInfoModal(true);
     const getInfoByteArray = new Uint8Array([
       0xaa, 0x14, 0xeb, 0x00, 0x00, 0x00, 0x00, 0xc6,
     ]);
@@ -419,125 +441,257 @@ const Panel = (props) => {
             } else {
               let value = base64ToHex(characteristic.value);
               console.log("+value in get info: ", value);
-
+              characteristicRef.current += value;
               //--- get battery value
-              if (value.includes("22437572424154223a")) {
-                console.log("data comes ....");
-                //the text is "CurBAT":
-                const text = hexToText(value);
-                const regex = /"CurBAT":"(.*?)%"/;
-                const match = text.match(regex);
-                if (match && match[1]) {
-                  const percentageValue = match[1];
-                  setDeviceInfo({ bat: percentageValue });
-                }
-              }
+              // if (value.includes("22437572424154223a")) {
+              //   console.log("data comes ....");
+              //   //the text is "CurBAT":
+              //   const text = hexToText(value);
+              //   const regex = /"CurBAT":"(.*?)%"/;
+              //   const match = text.match(regex);
+              //   if (match && match[1]) {
+              //     const percentageValue = match[1];
+              //     setDeviceInfo({ bat: percentageValue });
+              //   }
+              // }
 
-              if (value.includes("46696c654c69737422")) {
-                const cut = value.substring("46696c654c69737422");
-                characteristicRef.current = cut;
-                console.log("in if 394");
-              } else if (
-                characteristicRef.current.includes("46696c654c69737422")
-              ) {
-                characteristicRef.current += value;
-                result = hexToText(characteristicRef.current);
-              }
+              // if (value.includes("46696c654c69737422")) {
+              //   const cut = value.substring("46696c654c69737422");
+              //   characteristicRef.current = cut;
+              //   console.log("in if 394");
+              // } else if (
+              //   characteristicRef.current.includes("46696c654c69737422")
+              // ) {
+              //   characteristicRef.current += value;
+              //   result = hexToText(characteristicRef.current);
+              // }
             }
           },
           "InfoReadTransaction"
         );
       }, 500);
+
+      setTimeout(() => {
+        console.log("history array in 453:", historyListArray);
+        HistoryChecker(device);
+        console.log("data in 440:", characteristicRef.current);
+      }, 3000);
+      console.log("in 440 after monitoring...");
     } catch (error) {
       console.log(error);
     }
-
-    setTimeout(() => {
-      if (historyListArray.length === 0) {
-        console.log("history array in 453:", historyListArray);
-        HistoryChecker(result, device);
-        console.log("data in 440:", characteristicRef.current);
-      }
-    }, 2000);
-    console.log("in 440 after monitoring...");
   };
   //-------------------------------------------------------------------
-  const HistoryChecker = async (resultString, device) => {
-    console.log("result in history checker 450:", resultString);
-    if (!resultString) {
-      setGettingInfoModal(true);
-      //try to get info again:
-      let i = 0;
-      const sendInfo = async () => {
+  const HistoryChecker = async (device) => {
+    console.log("404:", characteristicRef.current);
+    if (characteristicRef.current.includes("46696c654c69737422")) {
+      infoDataHandler(device);
+    } else {
+      console.log("in else 408");
+      const sendInfo = () => {
         console.log("ref in 467:", characteristicRef.current);
-        if (i < 4) {
-          const getInfoByteArray = new Uint8Array([
-            0xaa, 0x14, 0xeb, 0x00, 0x00, 0x00, 0x00, 0xc6,
-          ]);
 
-          if (!deviceInfo.bat) {
-            BLTManager.writeCharacteristicWithResponseForDevice(
-              device.id,
-              "14839AC4-7D7E-415C-9A42-167340CF2339",
-              "8B00ACE7-EB0B-49B0-BBE9-9AEE0A26E1A3",
-              base64.encodeFromByteArray(getInfoByteArray)
-            ).then(() => {
-              console.log("data sent successfully to get info 475");
-            });
-            i++;
-            setTimeout(sendInfo, 1500);
-          } else {
-            return;
-          }
+        const getInfoByteArray = new Uint8Array([
+          0xaa, 0x14, 0xeb, 0x00, 0x00, 0x00, 0x00, 0xc6,
+        ]);
+
+        if (!characteristicRef.current.includes("46696c654c69737422")) {
+          BLTManager.writeCharacteristicWithResponseForDevice(
+            device.id,
+            "14839AC4-7D7E-415C-9A42-167340CF2339",
+            "8B00ACE7-EB0B-49B0-BBE9-9AEE0A26E1A3",
+            base64.encodeFromByteArray(getInfoByteArray)
+          ).then(() => {
+            console.log("data sent successfully to get info 475");
+            setTimeout(() => {
+              console.log("427:", characteristicRef.current);
+              if (characteristicRef.current.includes("46696c654c69737422")) {
+                infoDataHandler(device);
+                return;
+              }
+            }, 800);
+          });
         }
       };
-      await sendInfo();
-      console.log("before reconnect:", deviceInfo);
-      if (!deviceInfo.bat) {
-        await disconnectBluetooth();
-        await connectingToDevice();
+      function delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
       }
-      console.log("after reconnect:", deviceInfo);
-    } else {
-      setGettingInfoModal(false);
-      const result = [];
-      const index = resultString.indexOf("FileList") + 11;
-      const lastIndex = resultString.indexOf("}") - 2;
-      const historyTimeArray = resultString.slice(index, lastIndex).split(",");
-      console.log("in 494:", historyTimeArray);
+      async function checkAndSend() {
+        while (!characteristicRef.current.includes("46696c654c69737422")) {
+          console.log(
+            "condision in while:",
+            !characteristicRef.current.includes("46696c654c69737422")
+          );
+
+          sendInfo();
+          await delay(1500); // Delay of 1500 ms (1.5 seconds)
+        }
+      }
+      checkAndSend();
+    }
+  };
+  const infoDataHandler = async (device) => {
+    const dataString = await hexToText(characteristicRef.current);
+    console.log("data string:538", dataString);
+    const firstIndex = dataString.indexOf("{");
+    const secondIndex = dataString.indexOf("{", firstIndex + 1);
+    console.log(firstIndex, secondIndex);
+    const startIndex = secondIndex != -1 ? secondIndex : firstIndex;
+    console.log(startIndex);
+    const endIndex = dataString.lastIndexOf("}");
+    const selectedPart = dataString.substring(startIndex, endIndex + 1);
+    console.log("437:", selectedPart);
+    if (selectedPart.includes("FileList")) {
+      const result = JSON.parse(selectedPart);
+      setDeviceInfo({ bat: result.CurBAT });
+      const dataArray = result.FileList.split(",");
+      if (dataArray[dataArray.length - 1] === "") dataArray.pop();
+      console.log("data array", dataArray);
+
       const userData = activeUser.oxiDataArray;
-      if (userData === undefined && historyTimeArray.length > 0) {
-        const lastResult = [];
-        historyTimeArray.map((item) => {
-          let obj = { date: item, saved: false };
-          lastResult.push(obj);
-        });
-        setHistoryListArray(lastResult);
-        setHistoryAskModal(true);
-        console.log("in 485", lastResult);
-        characteristicRef.current = "";
-      } else {
-        await historyTimeArray.map((id) => {
-          console.log("user data in 520:", userData);
+      console.log("555", userData);
+      const lastResult = [];
+      if (dataArray.length > 0) {
+        console.log("in if 556");
+        dataArray.map((id) => {
+          console.log("id in map", id);
           const input = userData.findIndex((obj) => obj.id === id);
-          console.log("input 522:", input);
           if (input === -1) {
             let obj = { date: id, saved: false };
-            result.push(obj);
+            lastResult.push(obj);
           }
         });
-        if (result.length > 0) {
-          console.log("last result in 536:", result);
-          setHistoryListArray(result);
-          setHistoryAskModal(true);
-          characteristicRef.current = "";
-        } else {
-          characteristicRef.current = "";
-          sendAndGetNormalDataToOxi(device);
-        }
+      }
+      console.log("562:", lastResult);
+      if (lastResult.length > 0) {
+        console.log("in if 566");
+        setHistoryListArray(lastResult);
+        setGettingInfoModal(false);
+        setHistoryAskModal(true);
+        // characteristicRef.current = "";
+      } else {
+        // characteristicRef.current = "";
+        setGettingInfoModal(false);
+        sendAndGetNormalDataToOxi(device);
       }
     }
   };
+  // const HistoryChecker = async (resultString, device) => {
+  //   console.log("result in history checker 450:", resultString);
+  //   if (!resultString) {
+  //     setGettingInfoModal(true);
+  //     await BLTManager.cancelTransaction("InfoReadTransaction");
+  //     device.monitorCharacteristicForService(
+  //       "14839ac4-7d7e-415c-9a42-167340cf2339",
+  //       "0734594a-a8e7-4b1a-a6b1-cd5243059a57",
+  //       (error, characteristic) => {
+  //         if (error) {
+  //           console.log(
+  //             `Error monitoring characteristic in getting info 476 ${error}`
+  //           );
+  //         } else {
+  //           let value = base64ToHex(characteristic.value);
+  //           console.log("+value in get info: ", value);
+
+  //           //--- get battery value
+  //           if (value.includes("22437572424154223a")) {
+  //             console.log("data comes ....");
+  //             //the text is "CurBAT":
+  //             const text = hexToText(value);
+  //             const regex = /"CurBAT":"(.*?)%"/;
+  //             const match = text.match(regex);
+  //             if (match && match[1]) {
+  //               const percentageValue = match[1];
+  //               setDeviceInfo({ bat: percentageValue });
+  //             }
+  //           }
+
+  //           if (value.includes("46696c654c69737422")) {
+  //             const cut = value.substring("46696c654c69737422");
+  //             characteristicRef.current = cut;
+  //             console.log("in if 394");
+  //           } else if (
+  //             characteristicRef.current.includes("46696c654c69737422")
+  //           ) {
+  //             characteristicRef.current += value;
+  //             result = hexToText(characteristicRef.current);
+  //           }
+  //         }
+  //       },
+  //       "InfoReadTransaction2"
+  //     );
+  //     //try to get info again:
+  //     let i = 0;
+  //     const sendInfo = async () => {
+  //       console.log("ref in 467:", characteristicRef.current);
+  //       if (i < 4) {
+  //         const getInfoByteArray = new Uint8Array([
+  //           0xaa, 0x14, 0xeb, 0x00, 0x00, 0x00, 0x00, 0xc6,
+  //         ]);
+
+  //         if (!deviceInfo.bat) {
+  //           BLTManager.writeCharacteristicWithResponseForDevice(
+  //             device.id,
+  //             "14839AC4-7D7E-415C-9A42-167340CF2339",
+  //             "8B00ACE7-EB0B-49B0-BBE9-9AEE0A26E1A3",
+  //             base64.encodeFromByteArray(getInfoByteArray)
+  //           ).then(() => {
+  //             console.log("data sent successfully to get info 475");
+  //           });
+  //           i++;
+  //           setTimeout(sendInfo, 1500);
+  //         } else {
+  //           return;
+  //         }
+  //       }
+  //     };
+  //     await sendInfo();
+  //     console.log("before reconnect:", deviceInfo);
+  //     if (!deviceInfo.bat) {
+  //       await disconnectBluetooth();
+  //       await connectingToDevice();
+  //     }
+  //     console.log("after reconnect:", deviceInfo);
+  //   } else {
+  //     setGettingInfoModal(false);
+  //     const result = [];
+  //     const index = resultString.indexOf("FileList") + 11;
+  //     const lastIndex = resultString.indexOf("}") - 2;
+  //     const historyTimeArray = resultString.slice(index, lastIndex).split(",");
+  //     console.log("in 494:", historyTimeArray);
+  //     const userData = activeUser.oxiDataArray;
+  //     if (userData === undefined && historyTimeArray.length > 0) {
+  //       const lastResult = [];
+  //       historyTimeArray.map((item) => {
+  //         let obj = { date: item, saved: false };
+  //         lastResult.push(obj);
+  //       });
+  //       setHistoryListArray(lastResult);
+  //       setHistoryAskModal(true);
+  //       console.log("in 485", lastResult);
+  //       characteristicRef.current = "";
+  //     } else {
+  //       await historyTimeArray.map((id) => {
+  //         console.log("user data in 520:", userData);
+  //         const input = userData.findIndex((obj) => obj.id === id);
+  //         console.log("input 522:", input);
+  //         if (input === -1) {
+  //           let obj = { date: id, saved: false };
+  //           result.push(obj);
+  //         }
+  //       });
+  //       if (result.length > 0) {
+  //         console.log("last result in 536:", result);
+  //         setHistoryListArray(result);
+  //         setHistoryAskModal(true);
+  //         characteristicRef.current = "";
+  //       } else {
+  //         characteristicRef.current = "";
+  //         sendAndGetNormalDataToOxi(device);
+  //       }
+  //     }
+  //   }
+  // };
   //-------------------------------------------------------------------
   const sendAndGetNormalDataToOxi = async (device) => {
     await BLTManager.cancelTransaction("InfoReadTransaction");
@@ -738,7 +892,7 @@ const Panel = (props) => {
       setIsDataLoading(false);
     }, 1000);
   };
-  console.log(activeUser.name);
+
   //-------------------------------------------------------------------
   const takeRestOfData = async (itemTime) => {
     console.log("before while");
@@ -761,7 +915,7 @@ const Panel = (props) => {
     saveHistoryItem(itemTime);
     console.log("get data finished");
   };
-  console.log("763:", historyListArray);
+
   //-------------------------------------------------------------------
   //-----------------send data to dopp --------------------------------
   //-------------------------------------------------------------------
@@ -852,6 +1006,10 @@ const Panel = (props) => {
               <Text style={{ fontSize: 24, color: colors.text }}>X</Text>
             </TouchableOpacity>
             <TitleText children="Cihazı Bulamadım" size={28} />
+            <TitleText
+              children="Lütfen Bluetooth bağlantısı kapattıktan sonra yeniden deneyin."
+              size={18}
+            />
             <View style={{ flex: 1 }}>
               <Lottie
                 source={require("../assets/lottie/notFound.json")}
@@ -955,6 +1113,7 @@ const Panel = (props) => {
                   title="Tamam"
                   onPressFun={() => {
                     sendAndGetNormalDataToOxi(connectedDevice);
+                    setGettingInfoModal(false);
                     setHistoryAskModal(false);
                     setHistoryListArray([]);
                   }}
@@ -983,6 +1142,7 @@ const Panel = (props) => {
         isModalVisible={gettingInfoModal}
         animation="fade"
       >
+        <TitleText children="Oksimetreden Veri Alıyor" />
         <Lottie
           source={require("../assets/lottie/Loading-modal.json")}
           style={{ flex: 1 }}
@@ -993,5 +1153,4 @@ const Panel = (props) => {
     </ScreenLayout>
   );
 };
-
 export default Panel;
